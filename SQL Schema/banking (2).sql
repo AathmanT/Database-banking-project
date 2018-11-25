@@ -179,7 +179,7 @@ CREATE TABLE `lateloanreport` (
 --
 
 CREATE TABLE `loan` (
-  `LoanID` varchar(30) NOT NULL,
+  `LoanID` int auto_increment ,
   `InstallmentID` varchar(30) DEFAULT NULL,
   `AccountNo` varchar(30) DEFAULT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
