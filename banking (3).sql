@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 25, 2018 at 07:25 PM
+-- Generation Time: Nov 26, 2018 at 08:53 AM
 -- Server version: 10.1.29-MariaDB
 -- PHP Version: 7.2.0
 
@@ -179,13 +179,12 @@ CREATE TABLE `lateloanreport` (
 --
 
 CREATE TABLE `loan` (
-  `LoanID` int auto_increment ,
-  `InstallmentID` varchar(30) DEFAULT NULL,
+  `LoanID` int(11) NOT NULL,
+  `InstallmentID` int(11) DEFAULT NULL,
   `AccountNo` varchar(30) DEFAULT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
   `LoanAmount` float(30,2) DEFAULT NULL,
-  `InterestRate` float(10,2) DEFAULT NULL,
-  `Manual_Online` enum('Manual','Online') DEFAULT NULL
+  `InterestRate` float(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -209,7 +208,20 @@ CREATE TABLE `loanapplications` (
 --
 
 INSERT INTO `loanapplications` (`ApplicationID`, `LoanType`, `AccountNo`, `EmployeeID`, `RepayYears`, `Amount`, `Approved`) VALUES
-(12, '', '160001', '160001', 3, 10000.00, 0);
+(12, '', '160001', '160001', 3, 10000.00, 1);
+
+--
+-- Triggers `loanapplications`
+--
+DELIMITER $$
+CREATE TRIGGER `checkApproved` AFTER UPDATE ON `loanapplications` FOR EACH ROW BEGIN
+          if (NEW.Approved=1) THEN 
+             insert into loaninstallment (MonthlyAmount,InstallmentRemaining)
+             values ((new.amount+ new.amount*0.12*new.RepayYears*12)/(new.RepayYears*12),new.RepayYears*12);
+          END IF;
+        END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -218,9 +230,8 @@ INSERT INTO `loanapplications` (`ApplicationID`, `LoanType`, `AccountNo`, `Emplo
 --
 
 CREATE TABLE `loaninstallment` (
-  `InstallmentID` varchar(30) NOT NULL,
-  `PaymentPeriod` int(30) DEFAULT NULL,
-  `MonthlyAmount` double DEFAULT NULL,
+  `InstallmentID` int(11) NOT NULL,
+  `MonthlyAmount` float(10,2) DEFAULT 0,
   `InstallmentRemaining` double DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -228,8 +239,8 @@ CREATE TABLE `loaninstallment` (
 -- Dumping data for table `loaninstallment`
 --
 
-INSERT INTO `loaninstallment` (`InstallmentID`, `PaymentPeriod`, `MonthlyAmount`, `InstallmentRemaining`) VALUES
-('10001', 12, 1000, 10);
+INSERT INTO `loaninstallment` (`InstallmentID`, `MonthlyAmount`, `InstallmentRemaining`) VALUES
+(2, 1477.7777777777778, 36);
 
 -- --------------------------------------------------------
 
@@ -239,25 +250,11 @@ INSERT INTO `loaninstallment` (`InstallmentID`, `PaymentPeriod`, `MonthlyAmount`
 
 CREATE TABLE `loansettlement` (
   `SettlementID` varchar(30) NOT NULL,
-  `InstallmentID` varchar(30) DEFAULT NULL,
+  `InstallmentID` int(11) DEFAULT NULL,
   `DateTime` date DEFAULT NULL,
   `DueDate` date NOT NULL,
   `PaidOnTime` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `loansettlement`
---
-
-INSERT INTO `loansettlement` (`SettlementID`, `InstallmentID`, `DateTime`, `DueDate`, `PaidOnTime`) VALUES
-('160001', '10001', '2018-11-08', '2018-11-10', 0),
-('160002', '10001', '2018-11-08', '2018-11-10', 0),
-('160003', '10001', '2018-11-08', '2018-11-10', 0),
-('160004', '10001', '2018-11-08', '2018-11-10', 0),
-('160005', '10001', '2018-11-08', '2018-11-10', 0),
-('160008', '10001', '2018-11-08', '2018-11-10', 1),
-('160009', '10001', '2018-11-08', '2018-11-10', 1),
-('160010', '10001', '2018-11-08', '2018-11-10', 1);
 
 -- --------------------------------------------------------
 
@@ -289,7 +286,7 @@ CREATE TABLE `manager` (
 --
 
 CREATE TABLE `onlineloan` (
-  `LoanID` varchar(30) NOT NULL,
+  `LoanID` int(11) NOT NULL,
   `FixedID` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -535,10 +532,22 @@ ALTER TABLE `transactions`
 --
 
 --
+-- AUTO_INCREMENT for table `loan`
+--
+ALTER TABLE `loan`
+  MODIFY `LoanID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `loanapplications`
 --
 ALTER TABLE `loanapplications`
   MODIFY `ApplicationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `loaninstallment`
+--
+ALTER TABLE `loaninstallment`
+  MODIFY `InstallmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
