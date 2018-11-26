@@ -179,12 +179,13 @@ CREATE TABLE `lateloanreport` (
 --
 
 CREATE TABLE `loan` (
-  `LoanID` int(11) NOT NULL,
-  `InstallmentID` int(11) DEFAULT NULL,
+  `LoanID` int auto_increment primary key,
   `AccountNo` varchar(30) DEFAULT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
   `LoanAmount` float(30,2) DEFAULT NULL,
-  `InterestRate` float(10,2) DEFAULT NULL
+  `InterestRate` float(10,2) DEFAULT NULL,
+   `MonthlyAmount` float(10,2) DEFAULT 0,
+  `InstallmentRemaining` int DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -216,8 +217,8 @@ INSERT INTO `loanapplications` (`ApplicationID`, `LoanType`, `AccountNo`, `Emplo
 DELIMITER $$
 CREATE TRIGGER `checkApproved` AFTER UPDATE ON `loanapplications` FOR EACH ROW BEGIN
           if (NEW.Approved=1) THEN 
-             insert into loaninstallment (MonthlyAmount,InstallmentRemaining)
-             values ((new.amount+ new.amount*0.12*new.RepayYears*12)/(new.RepayYears*12),new.RepayYears*12);
+             insert into loan (AccountNo,LoanType,LoanAmount,InterestRate,MonthlyAmount,InstallmentRemaining)
+             values (new.AccountNo,new.LoanType,new.Amount,0.12,(new.amount+ new.amount*0.12*new.RepayYears*12)/(new.RepayYears*12),new.RepayYears*12);
           END IF;
         END
 $$
@@ -229,18 +230,12 @@ DELIMITER ;
 -- Table structure for table `loaninstallment`
 --
 
-CREATE TABLE `loaninstallment` (
-  `InstallmentID` int(11) NOT NULL,
-  `MonthlyAmount` float(10,2) DEFAULT 0,
-  `InstallmentRemaining` double DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `loaninstallment`
 --
 
-INSERT INTO `loaninstallment` (`InstallmentID`, `MonthlyAmount`, `InstallmentRemaining`) VALUES
-(2, 1477.7777777777778, 36);
+
 
 -- --------------------------------------------------------
 
@@ -250,7 +245,7 @@ INSERT INTO `loaninstallment` (`InstallmentID`, `MonthlyAmount`, `InstallmentRem
 
 CREATE TABLE `loansettlement` (
   `SettlementID` varchar(30) NOT NULL,
-  `InstallmentID` int(11) DEFAULT NULL,
+  `LoanID` int,
   `DateTime` date DEFAULT NULL,
   `DueDate` date NOT NULL,
   `PaidOnTime` tinyint(1) DEFAULT NULL
@@ -286,7 +281,7 @@ CREATE TABLE `manager` (
 --
 
 CREATE TABLE `onlineloan` (
-  `LoanID` int(11) NOT NULL,
+  `LoanID` int ,
   `FixedID` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -453,9 +448,8 @@ ALTER TABLE `lateloanreport`
 -- Indexes for table `loan`
 --
 ALTER TABLE `loan`
-  ADD PRIMARY KEY (`LoanID`),
-  ADD KEY `AccountNo` (`AccountNo`),
-  ADD KEY `InstallmentID` (`InstallmentID`);
+  ADD KEY `AccountNo` (`AccountNo`);
+
 
 --
 -- Indexes for table `loanapplications`
@@ -468,15 +462,14 @@ ALTER TABLE `loanapplications`
 --
 -- Indexes for table `loaninstallment`
 --
-ALTER TABLE `loaninstallment`
-  ADD PRIMARY KEY (`InstallmentID`);
+
 
 --
 -- Indexes for table `loansettlement`
 --
 ALTER TABLE `loansettlement`
   ADD PRIMARY KEY (`SettlementID`),
-  ADD KEY `InstallmentID` (`InstallmentID`);
+  ADD KEY `LoanID` (`LoanID`);
 
 --
 -- Indexes for table `login`
@@ -532,10 +525,7 @@ ALTER TABLE `transactions`
 --
 
 --
--- AUTO_INCREMENT for table `loan`
---
-ALTER TABLE `loan`
-  MODIFY `LoanID` int(11) NOT NULL AUTO_INCREMENT;
+
 
 --
 -- AUTO_INCREMENT for table `loanapplications`
@@ -544,10 +534,7 @@ ALTER TABLE `loanapplications`
   MODIFY `ApplicationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT for table `loaninstallment`
---
-ALTER TABLE `loaninstallment`
-  MODIFY `InstallmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
 
 --
 -- Constraints for dumped tables
@@ -595,8 +582,8 @@ ALTER TABLE `lateloanreport`
 -- Constraints for table `loan`
 --
 ALTER TABLE `loan`
-  ADD CONSTRAINT `loan_ibfk_1` FOREIGN KEY (`AccountNo`) REFERENCES `account` (`AccountNo`),
-  ADD CONSTRAINT `loan_ibfk_2` FOREIGN KEY (`InstallmentID`) REFERENCES `loaninstallment` (`InstallmentID`);
+  ADD CONSTRAINT `loan_ibfk_1` FOREIGN KEY (`AccountNo`) REFERENCES `account` (`AccountNo`);
+
 
 --
 -- Constraints for table `loanapplications`
@@ -609,7 +596,7 @@ ALTER TABLE `loanapplications`
 -- Constraints for table `loansettlement`
 --
 ALTER TABLE `loansettlement`
-  ADD CONSTRAINT `loansettlement_ibfk_1` FOREIGN KEY (`InstallmentID`) REFERENCES `loaninstallment` (`InstallmentID`);
+  ADD CONSTRAINT `loansettlement_ibfk_1` FOREIGN KEY (`LoanID`) REFERENCES `loan` (`LoanID`);
 
 --
 -- Constraints for table `manager`
