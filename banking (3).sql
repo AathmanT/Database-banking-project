@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.4
+-- version 4.7.9
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 26, 2018 at 08:53 AM
--- Server version: 10.1.29-MariaDB
--- PHP Version: 7.2.0
+-- Generation Time: Nov 26, 2018 at 08:32 PM
+-- Server version: 10.1.31-MariaDB
+-- PHP Version: 5.6.34
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `banking`
+-- Database: `bank9`
 --
 
 -- --------------------------------------------------------
@@ -29,10 +29,10 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `account` (
-  `AccountNo` varchar(30) NOT NULL,
-  `Balance` double DEFAULT NULL,
-  `BranchID` varchar(30) DEFAULT NULL,
-  `AccountType` enum('SavingAccount',' CurrentAccount') DEFAULT NULL
+                         `AccountNo` varchar(30) NOT NULL,
+                         `Balance` double DEFAULT NULL,
+                         `BranchID` varchar(30) DEFAULT NULL,
+                         `AccountType` enum('SavingAccount',' CurrentAccount') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -50,8 +50,8 @@ INSERT INTO `account` (`AccountNo`, `Balance`, `BranchID`, `AccountType`) VALUES
 --
 
 CREATE TABLE `atm` (
-  `atmID` varchar(30) NOT NULL,
-  `BranchID` varchar(30) DEFAULT NULL
+                     `atmID` varchar(30) NOT NULL,
+                     `BranchID` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -61,9 +61,9 @@ CREATE TABLE `atm` (
 --
 
 CREATE TABLE `atmtransaction` (
-  `TransactionID` varchar(30) NOT NULL,
-  `AccountNo` varchar(30) DEFAULT NULL,
-  `atmID` varchar(30) DEFAULT NULL
+                                `TransactionID` varchar(30) NOT NULL,
+                                `AccountNo` varchar(30) DEFAULT NULL,
+                                `atmID` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -73,10 +73,10 @@ CREATE TABLE `atmtransaction` (
 --
 
 CREATE TABLE `branch` (
-  `BranchID` varchar(30) NOT NULL,
-  `BranchType` enum('Head Office','Area Branch') DEFAULT NULL,
-  `BranchName` varchar(30) DEFAULT NULL,
-  `BranchCity` varchar(30) DEFAULT NULL
+                        `BranchID` varchar(30) NOT NULL,
+                        `BranchType` enum('Head Office','Area Branch') DEFAULT NULL,
+                        `BranchName` varchar(30) DEFAULT NULL,
+                        `BranchCity` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -93,11 +93,11 @@ INSERT INTO `branch` (`BranchID`, `BranchType`, `BranchName`, `BranchCity`) VALU
 --
 
 CREATE TABLE `customer` (
-  `CustomerID` varchar(30) NOT NULL,
-  `CustomerName` varchar(30) DEFAULT NULL,
-  `CustomerAddress` varchar(30) DEFAULT NULL,
-  `CustomerEmail` varchar(30) DEFAULT NULL,
-  `CustomerPhoneNo` int(11) DEFAULT NULL
+                          `CustomerID` varchar(30) NOT NULL,
+                          `CustomerName` varchar(30) DEFAULT NULL,
+                          `CustomerAddress` varchar(30) DEFAULT NULL,
+                          `CustomerEmail` varchar(30) DEFAULT NULL,
+                          `CustomerPhoneNo` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -107,8 +107,8 @@ CREATE TABLE `customer` (
 --
 
 CREATE TABLE `customer_account` (
-  `CustomerID` varchar(30) NOT NULL,
-  `AccountNo` varchar(30) NOT NULL
+                                  `CustomerID` varchar(30) NOT NULL,
+                                  `AccountNo` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -118,12 +118,12 @@ CREATE TABLE `customer_account` (
 --
 
 CREATE TABLE `employee` (
-  `EmployeeID` varchar(30) NOT NULL,
-  `BranchID` varchar(30) DEFAULT NULL,
-  `EmpName` varchar(30) DEFAULT NULL,
-  `EmpAddress` varchar(30) DEFAULT NULL,
-  `EmpEmail` varchar(30) DEFAULT NULL,
-  `EmpPhoneNo` int(11) DEFAULT NULL
+                          `EmployeeID` varchar(30) NOT NULL,
+                          `BranchID` varchar(30) DEFAULT NULL,
+                          `EmpName` varchar(30) DEFAULT NULL,
+                          `EmpAddress` varchar(30) DEFAULT NULL,
+                          `EmpEmail` varchar(30) DEFAULT NULL,
+                          `EmpPhoneNo` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -140,10 +140,17 @@ INSERT INTO `employee` (`EmployeeID`, `BranchID`, `EmpName`, `EmpAddress`, `EmpE
 --
 
 CREATE TABLE `fdplan` (
-  `FDPlanID` varchar(30) NOT NULL,
-  `InterestRate` double DEFAULT NULL,
-  `Period` int(11) DEFAULT NULL
+                        `FDPlanID` int(11) NOT NULL,
+                        `InterestRate` double DEFAULT NULL,
+                        `Period` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `fdplan`
+--
+
+INSERT INTO `fdplan` (`FDPlanID`, `InterestRate`, `Period`) VALUES
+(1, 16, 5);
 
 -- --------------------------------------------------------
 
@@ -152,13 +159,33 @@ CREATE TABLE `fdplan` (
 --
 
 CREATE TABLE `fixeddeposit` (
-  `FixedID` varchar(30) NOT NULL,
-  `SavingNo` varchar(30) DEFAULT NULL,
-  `FDAmount` varchar(30) DEFAULT NULL,
-  `InterestRate` double DEFAULT NULL,
-  `OpeningDate` date DEFAULT NULL,
-  `FDPlanID` varchar(30) DEFAULT NULL
+                              `FixedID` int(11) NOT NULL,
+                              `SavingNo` varchar(30) DEFAULT NULL,
+                              `FDAmount` varchar(30) DEFAULT NULL,
+                              `OpeningDate` date DEFAULT NULL,
+                              `FDPlanID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `fixeddeposit`
+--
+
+INSERT INTO `fixeddeposit` (`FixedID`, `SavingNo`, `FDAmount`, `OpeningDate`, `FDPlanID`) VALUES
+(1, '160001', '1266', NULL, 1);
+
+--
+-- Triggers `fixeddeposit`
+--
+DELIMITER $$
+CREATE TRIGGER `checkAccountNo` BEFORE INSERT ON `fixeddeposit` FOR EACH ROW BEGIN
+if ( (SELECT COUNT(savingaccount.AccountNo) FROM savingaccount
+WHERE savingaccount.AccountNo =NEW.SavingNo) =0) THEN
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'saving account no not found ';
+END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -167,9 +194,9 @@ CREATE TABLE `fixeddeposit` (
 --
 
 CREATE TABLE `lateloanreport` (
-  `ReportID` varchar(30) DEFAULT NULL,
-  `Date` datetime DEFAULT NULL,
-  `SettlementID` varchar(30) DEFAULT NULL
+                                `ReportID` varchar(30) DEFAULT NULL,
+                                `Date` datetime DEFAULT NULL,
+                                `SettlementID` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -179,14 +206,14 @@ CREATE TABLE `lateloanreport` (
 --
 
 CREATE TABLE `loan` (
-  `LoanID` int auto_increment primary key,
-  `AccountNo` varchar(30) DEFAULT NULL,
-  `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
-  `LoanAmount` float(30,2) DEFAULT NULL,
+                      `LoanID` int(11) NOT NULL,
+                      `AccountNo` varchar(30) DEFAULT NULL,
+                      `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
+                      `LoanAmount` float(30,2) DEFAULT NULL,
   `InterestRate` float(10,2) DEFAULT NULL,
-   `MonthlyAmount` float(10,2) DEFAULT 0,
-  `InstallmentRemaining` int DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `MonthlyAmount` float(10,2) DEFAULT '0.00',
+  `InstallmentRemaining` int(11) DEFAULT '0'
+  ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -195,14 +222,14 @@ CREATE TABLE `loan` (
 --
 
 CREATE TABLE `loanapplications` (
-  `ApplicationID` int(11) NOT NULL,
-  `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
-  `AccountNo` varchar(30) DEFAULT NULL,
-  `EmployeeID` varchar(30) DEFAULT NULL,
-  `RepayYears` int(4) DEFAULT NULL,
-  `Amount` float(30,2) DEFAULT NULL,
+                                  `ApplicationID` int(11) NOT NULL,
+                                  `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
+                                  `AccountNo` varchar(30) DEFAULT NULL,
+                                  `EmployeeID` varchar(30) DEFAULT NULL,
+                                  `RepayYears` int(4) DEFAULT NULL,
+                                  `Amount` float(30,2) DEFAULT NULL,
   `Approved` tinyint(1) DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `loanapplications`
@@ -216,26 +243,13 @@ INSERT INTO `loanapplications` (`ApplicationID`, `LoanType`, `AccountNo`, `Emplo
 --
 DELIMITER $$
 CREATE TRIGGER `checkApproved` AFTER UPDATE ON `loanapplications` FOR EACH ROW BEGIN
-          if (NEW.Approved=1) THEN 
-             insert into loan (AccountNo,LoanType,LoanAmount,InterestRate,MonthlyAmount,InstallmentRemaining)
-             values (new.AccountNo,new.LoanType,new.Amount,0.12,(new.amount+ new.amount*0.12*new.RepayYears*12)/(new.RepayYears*12),new.RepayYears*12);
-          END IF;
-        END
+                                       if (NEW.Approved=1) THEN
+                                     insert into loan (AccountNo,LoanType,LoanAmount,InterestRate,MonthlyAmount,InstallmentRemaining)
+                                     values (new.AccountNo,new.LoanType,new.Amount,0.12,(new.amount+ new.amount*0.12*new.RepayYears*12)/(new.RepayYears*12),new.RepayYears*12);
+END IF;
+END
 $$
 DELIMITER ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `loaninstallment`
---
-
-
---
--- Dumping data for table `loaninstallment`
---
-
-
 
 -- --------------------------------------------------------
 
@@ -244,11 +258,11 @@ DELIMITER ;
 --
 
 CREATE TABLE `loansettlement` (
-  `SettlementID` varchar(30) NOT NULL,
-  `LoanID` int,
-  `DateTime` date DEFAULT NULL,
-  `DueDate` date NOT NULL,
-  `PaidOnTime` tinyint(1) DEFAULT NULL
+                                `SettlementID` varchar(30) NOT NULL,
+                                `LoanID` int(11) DEFAULT NULL,
+                                `DateTime` date DEFAULT NULL,
+                                `DueDate` date NOT NULL,
+                                `PaidOnTime` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -258,10 +272,10 @@ CREATE TABLE `loansettlement` (
 --
 
 CREATE TABLE `login` (
-  `Type` enum('Employee','Customer','Manager') DEFAULT NULL,
-  `Username` varchar(30) NOT NULL,
-  `Password` varchar(30) DEFAULT NULL,
-  `BankID` varchar(30) DEFAULT NULL
+                       `Type` enum('Employee','Customer','Manager') DEFAULT NULL,
+                       `Username` varchar(30) NOT NULL,
+                       `Password` varchar(30) DEFAULT NULL,
+                       `BankID` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -281,8 +295,8 @@ CREATE TABLE `manager` (
 --
 
 CREATE TABLE `onlineloan` (
-  `LoanID` int ,
-  `FixedID` varchar(30) DEFAULT NULL
+                            `LoanID` int(11) NOT NULL,
+                            `FixedID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -292,9 +306,9 @@ CREATE TABLE `onlineloan` (
 --
 
 CREATE TABLE `onlinetransaction` (
-  `TransactionID` varchar(30) NOT NULL,
-  `SenderAccNo` varchar(30) DEFAULT NULL,
-  `RecieverAccNo` varchar(30) DEFAULT NULL
+                                   `TransactionID` varchar(30) NOT NULL,
+                                   `SenderAccNo` varchar(30) DEFAULT NULL,
+                                   `RecieverAccNo` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -317,10 +331,17 @@ INSERT INTO `onlinetransaction` (`TransactionID`, `SenderAccNo`, `RecieverAccNo`
 --
 
 CREATE TABLE `savingaccount` (
-  `NoOfWithdrawals` int(11) DEFAULT NULL,
-  `AccountNo` varchar(30) NOT NULL,
-  `PlanID` varchar(30) DEFAULT NULL
+                               `NoOfWithdrawals` int(11) DEFAULT NULL,
+                               `AccountNo` varchar(30) NOT NULL,
+                               `PlanID` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `savingaccount`
+--
+
+INSERT INTO `savingaccount` (`NoOfWithdrawals`, `AccountNo`, `PlanID`) VALUES
+(6, '160001', '1');
 
 -- --------------------------------------------------------
 
@@ -329,10 +350,17 @@ CREATE TABLE `savingaccount` (
 --
 
 CREATE TABLE `savingplan` (
-  `PlanID` varchar(30) NOT NULL,
-  `InterestRate` double DEFAULT NULL,
-  `MinimumAmount` int(30) DEFAULT NULL
+                            `PlanID` varchar(30) NOT NULL,
+                            `InterestRate` double DEFAULT NULL,
+                            `MinimumAmount` int(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `savingplan`
+--
+
+INSERT INTO `savingplan` (`PlanID`, `InterestRate`, `MinimumAmount`) VALUES
+('1', 10, 1200);
 
 -- --------------------------------------------------------
 
@@ -341,10 +369,10 @@ CREATE TABLE `savingplan` (
 --
 
 CREATE TABLE `transactionreport` (
-  `ReportID` varchar(30) NOT NULL,
-  `Date` datetime NOT NULL,
-  `TotalWidrawal` double DEFAULT NULL,
-  `TotalDeposit` double DEFAULT NULL
+                                   `ReportID` varchar(30) NOT NULL,
+                                   `Date` datetime NOT NULL,
+                                   `TotalWidrawal` double DEFAULT NULL,
+                                   `TotalDeposit` double DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -354,11 +382,11 @@ CREATE TABLE `transactionreport` (
 --
 
 CREATE TABLE `transactions` (
-  `TransactionID` varchar(30) NOT NULL,
-  `Amount` float(30,2) DEFAULT NULL,
+                              `TransactionID` varchar(30) NOT NULL,
+                              `Amount` float(30,2) DEFAULT NULL,
   `Date_Time` datetime DEFAULT NULL,
   `Type` enum('Online','ATM') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `transactions`
@@ -448,8 +476,8 @@ ALTER TABLE `lateloanreport`
 -- Indexes for table `loan`
 --
 ALTER TABLE `loan`
+  ADD PRIMARY KEY (`LoanID`),
   ADD KEY `AccountNo` (`AccountNo`);
-
 
 --
 -- Indexes for table `loanapplications`
@@ -458,11 +486,6 @@ ALTER TABLE `loanapplications`
   ADD PRIMARY KEY (`ApplicationID`),
   ADD KEY `AccountNo` (`AccountNo`),
   ADD KEY `EmployeeID` (`EmployeeID`);
-
---
--- Indexes for table `loaninstallment`
---
-
 
 --
 -- Indexes for table `loansettlement`
@@ -525,16 +548,28 @@ ALTER TABLE `transactions`
 --
 
 --
+-- AUTO_INCREMENT for table `fdplan`
+--
+ALTER TABLE `fdplan`
+  MODIFY `FDPlanID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
+--
+-- AUTO_INCREMENT for table `fixeddeposit`
+--
+ALTER TABLE `fixeddeposit`
+  MODIFY `FixedID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `loan`
+--
+ALTER TABLE `loan`
+  MODIFY `LoanID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `loanapplications`
 --
 ALTER TABLE `loanapplications`
   MODIFY `ApplicationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
-
 
 --
 -- Constraints for dumped tables
@@ -583,7 +618,6 @@ ALTER TABLE `lateloanreport`
 --
 ALTER TABLE `loan`
   ADD CONSTRAINT `loan_ibfk_1` FOREIGN KEY (`AccountNo`) REFERENCES `account` (`AccountNo`);
-
 
 --
 -- Constraints for table `loanapplications`
