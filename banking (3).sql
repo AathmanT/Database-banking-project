@@ -93,9 +93,11 @@ INSERT INTO `branch` (`BranchID`, `BranchType`, `BranchName`, `BranchCity`) VALU
 --
 
 CREATE TABLE `customer` (
-  `CustomerID` varchar(30) NOT NULL,
+  `CustomerID` int AUTO_INCREMENT primary key,
   `CustomerName` varchar(30) DEFAULT NULL,
   `CustomerAddress` varchar(30) DEFAULT NULL,
+  `DateOfBirth` DATE DEFAULT  NULL,
+  `NIC` varchar(30) DEFAULT  NULL,
   `CustomerEmail` varchar(30) DEFAULT NULL,
   `CustomerPhoneNo` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -107,7 +109,7 @@ CREATE TABLE `customer` (
 --
 
 CREATE TABLE `customer_account` (
-  `CustomerID` varchar(30) NOT NULL,
+  `CustomerID` int NOT NULL,
   `AccountNo` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -412,9 +414,7 @@ ALTER TABLE `branch`
 
 --
 -- Indexes for table `customer`
---
-ALTER TABLE `customer`
-  ADD PRIMARY KEY (`CustomerID`);
+
 
 --
 -- Indexes for table `customer_account`
