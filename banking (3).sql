@@ -69,7 +69,7 @@ CREATE TABLE `atmtransaction` (
 --
 
 CREATE TABLE `branch` (
-  `BranchID` int primary key,
+  `BranchID` int auto_increment primary key,
   `BranchType` enum('Head Office','Area Branch') DEFAULT NULL,
   `BranchName` varchar(30) DEFAULT NULL,
   `BranchCity` varchar(30) DEFAULT NULL
@@ -317,7 +317,7 @@ INSERT INTO `onlinetransaction` (`TransactionID`, `SenderAccNo`, `RecieverAccNo`
 CREATE TABLE `savingaccount` (
   `NoOfWithdrawals` int(11) DEFAULT NULL,
   `AccountNo` int ,
-  `PlanID` varchar(30) DEFAULT NULL
+  `PlanID` int
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -327,7 +327,8 @@ CREATE TABLE `savingaccount` (
 --
 
 CREATE TABLE `savingplan` (
-  `PlanID` varchar(30) NOT NULL,
+  `PlanID` int auto_increment primary key,
+  `Category` varchar(30) DEFAULT  NULL,
   `InterestRate` double DEFAULT NULL,
   `MinimumAmount` int(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -500,8 +501,6 @@ ALTER TABLE `savingaccount`
 --
 -- Indexes for table `savingplan`
 --
-ALTER TABLE `savingplan`
-  ADD PRIMARY KEY (`PlanID`);
 
 --
 -- Indexes for table `transactionreport`
