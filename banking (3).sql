@@ -29,19 +29,16 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `account` (
-  `AccountNo` varchar(30) NOT NULL,
-  `Balance` double DEFAULT NULL,
-  `BranchID` varchar(30) DEFAULT NULL,
-  `AccountType` enum('SavingAccount',' CurrentAccount') DEFAULT NULL
+  `AccountNo` int auto_increment PRIMARY  KEY ,
+  `Balance` double DEFAULT 0,
+  `BranchID` int,
+  `AccountType` enum('SavingAccount',' CurrentAccount') DEFAULT NULL,
+  `PlanID` int
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `account`
 --
-
-INSERT INTO `account` (`AccountNo`, `Balance`, `BranchID`, `AccountType`) VALUES
-('160001', 800, '10', 'SavingAccount'),
-('160002', 600, '10', 'SavingAccount');
 
 -- --------------------------------------------------------
 
@@ -51,7 +48,7 @@ INSERT INTO `account` (`AccountNo`, `Balance`, `BranchID`, `AccountType`) VALUES
 
 CREATE TABLE `atm` (
   `atmID` varchar(30) NOT NULL,
-  `BranchID` varchar(30) DEFAULT NULL
+  `BranchID` int
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -62,7 +59,7 @@ CREATE TABLE `atm` (
 
 CREATE TABLE `atmtransaction` (
   `TransactionID` varchar(30) NOT NULL,
-  `AccountNo` varchar(30) DEFAULT NULL,
+  `AccountNo` int DEFAULT NULL,
   `atmID` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -73,7 +70,7 @@ CREATE TABLE `atmtransaction` (
 --
 
 CREATE TABLE `branch` (
-  `BranchID` varchar(30) NOT NULL,
+  `BranchID` int auto_increment primary key,
   `BranchType` enum('Head Office','Area Branch') DEFAULT NULL,
   `BranchName` varchar(30) DEFAULT NULL,
   `BranchCity` varchar(30) DEFAULT NULL
@@ -83,9 +80,13 @@ CREATE TABLE `branch` (
 -- Dumping data for table `branch`
 --
 
-INSERT INTO `branch` (`BranchID`, `BranchType`, `BranchName`, `BranchCity`) VALUES
-('10', 'Area Branch', 'Colombo', 'Moratuwa');
-
+insert into `branch` (`BranchType`,`BranchName`,`BranchCity`) VALUES
+('Head Office','Jaffna','Jaffna'),
+('Area Branch','Nallur','Jaffna'),
+('Head Office','Mankulam','Vavuniya'),
+('Area Branch','Kaithadi','Jaffna'),
+('Head Branch','Kobai','Trinco'),
+('Area Branch','Kokuvil','Baticola');
 -- --------------------------------------------------------
 
 --
@@ -93,9 +94,11 @@ INSERT INTO `branch` (`BranchID`, `BranchType`, `BranchName`, `BranchCity`) VALU
 --
 
 CREATE TABLE `customer` (
-  `CustomerID` varchar(30) NOT NULL,
+  `CustomerID` int AUTO_INCREMENT primary key,
   `CustomerName` varchar(30) DEFAULT NULL,
   `CustomerAddress` varchar(30) DEFAULT NULL,
+  `DateOfBirth` DATE DEFAULT  NULL,
+  `NIC` varchar(30) DEFAULT  NULL,
   `CustomerEmail` varchar(30) DEFAULT NULL,
   `CustomerPhoneNo` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -107,8 +110,8 @@ CREATE TABLE `customer` (
 --
 
 CREATE TABLE `customer_account` (
-  `CustomerID` varchar(30) NOT NULL,
-  `AccountNo` varchar(30) NOT NULL
+  `CustomerID` int NOT NULL,
+  `AccountNo` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -119,7 +122,7 @@ CREATE TABLE `customer_account` (
 
 CREATE TABLE `employee` (
   `EmployeeID` varchar(30) NOT NULL,
-  `BranchID` varchar(30) DEFAULT NULL,
+  `BranchID` int,
   `EmpName` varchar(30) DEFAULT NULL,
   `EmpAddress` varchar(30) DEFAULT NULL,
   `EmpEmail` varchar(30) DEFAULT NULL,
@@ -130,8 +133,6 @@ CREATE TABLE `employee` (
 -- Dumping data for table `employee`
 --
 
-INSERT INTO `employee` (`EmployeeID`, `BranchID`, `EmpName`, `EmpAddress`, `EmpEmail`, `EmpPhoneNo`) VALUES
-('160001', '10', 'Tony', 'Malibu', 'tony', 1221212);
 
 -- --------------------------------------------------------
 
@@ -153,7 +154,7 @@ CREATE TABLE `fdplan` (
 
 CREATE TABLE `fixeddeposit` (
   `FixedID` varchar(30) NOT NULL,
-  `SavingNo` varchar(30) DEFAULT NULL,
+  `SavingNo` int,
   `FDAmount` varchar(30) DEFAULT NULL,
   `InterestRate` double DEFAULT NULL,
   `OpeningDate` date DEFAULT NULL,
@@ -180,7 +181,8 @@ CREATE TABLE `lateloanreport` (
 
 CREATE TABLE `loan` (
   `LoanID` int auto_increment primary key,
-  `AccountNo` varchar(30) DEFAULT NULL,
+  `InstallmentID` int(11) DEFAULT NULL,
+  `AccountNo` int DEFAULT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
   `LoanAmount` float(30,2) DEFAULT NULL,
   `InterestRate` float(10,2) DEFAULT NULL,
@@ -197,7 +199,7 @@ CREATE TABLE `loan` (
 CREATE TABLE `loanapplications` (
   `ApplicationID` int(11) NOT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
-  `AccountNo` varchar(30) DEFAULT NULL,
+  `AccountNo` int,
   `EmployeeID` varchar(30) DEFAULT NULL,
   `RepayYears` int(4) DEFAULT NULL,
   `Amount` float(30,2) DEFAULT NULL,
@@ -208,8 +210,7 @@ CREATE TABLE `loanapplications` (
 -- Dumping data for table `loanapplications`
 --
 
-INSERT INTO `loanapplications` (`ApplicationID`, `LoanType`, `AccountNo`, `EmployeeID`, `RepayYears`, `Amount`, `Approved`) VALUES
-(12, '', '160001', '160001', 3, 10000.00, 1);
+
 
 --
 -- Triggers `loanapplications`
@@ -318,8 +319,8 @@ INSERT INTO `onlinetransaction` (`TransactionID`, `SenderAccNo`, `RecieverAccNo`
 
 CREATE TABLE `savingaccount` (
   `NoOfWithdrawals` int(11) DEFAULT NULL,
-  `AccountNo` varchar(30) NOT NULL,
-  `PlanID` varchar(30) DEFAULT NULL
+  `AccountNo` int ,
+  `PlanID` int
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -329,11 +330,21 @@ CREATE TABLE `savingaccount` (
 --
 
 CREATE TABLE `savingplan` (
-  `PlanID` varchar(30) NOT NULL,
+  `PlanID` int auto_increment primary key,
+  `Category` varchar(30) DEFAULT  NULL,
   `InterestRate` double DEFAULT NULL,
   `MinimumAmount` int(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `savingplan`
+--
+
+insert into `savingplan` (`Category`,`InterestRate`,`MinimumAmount`) VALUES
+('Children',12,0),
+('Teen',11,500),
+('Adult(18+)',10,1000),
+('Senior(60+)',13,1000);
 -- --------------------------------------------------------
 
 --
@@ -382,8 +393,8 @@ INSERT INTO `transactions` (`TransactionID`, `Amount`, `Date_Time`, `Type`) VALU
 -- Indexes for table `account`
 --
 ALTER TABLE `account`
-  ADD PRIMARY KEY (`AccountNo`),
-  ADD KEY `BranchID` (`BranchID`);
+  ADD KEY `BranchID` (`BranchID`),
+  ADD KEY `PlanID` (`PlanID`);
 
 --
 -- Indexes for table `atm`
@@ -401,15 +412,11 @@ ALTER TABLE `atmtransaction`
 
 --
 -- Indexes for table `branch`
---
-ALTER TABLE `branch`
-  ADD PRIMARY KEY (`BranchID`);
+
 
 --
 -- Indexes for table `customer`
---
-ALTER TABLE `customer`
-  ADD PRIMARY KEY (`CustomerID`);
+
 
 --
 -- Indexes for table `customer_account`
@@ -505,8 +512,6 @@ ALTER TABLE `savingaccount`
 --
 -- Indexes for table `savingplan`
 --
-ALTER TABLE `savingplan`
-  ADD PRIMARY KEY (`PlanID`);
 
 --
 -- Indexes for table `transactionreport`
@@ -544,7 +549,8 @@ ALTER TABLE `loanapplications`
 -- Constraints for table `account`
 --
 ALTER TABLE `account`
-  ADD CONSTRAINT `account_ibfk_1` FOREIGN KEY (`BranchID`) REFERENCES `branch` (`BranchID`);
+  ADD CONSTRAINT `account_ibfk_1` FOREIGN KEY (`PlanID`) REFERENCES `savingplan` (`PlanID`),
+  ADD CONSTRAINT `account_ibfk_2` FOREIGN KEY (`BranchID`) REFERENCES `branch` (`BranchID`);
 
 --
 -- Constraints for table `atm`
@@ -615,6 +621,8 @@ ALTER TABLE `onlineloan`
 --
 ALTER TABLE `onlinetransaction`
   ADD CONSTRAINT `onlinetransaction_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `transactions` (`TransactionID`);
+
+
 
 --
 -- Constraints for table `savingaccount`

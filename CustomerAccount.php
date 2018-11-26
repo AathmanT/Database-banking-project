@@ -45,15 +45,22 @@
 </style>
 <body>
 
-<h3>Customer Registration </h3>
+<h3>Customer SavingAccount Registration </h3>
 
 <div>
     <form action="" method="post">
         <label for="accounttype">AccountType</label>
         <select type="text" id="accounttype" required name="accounttype">
-            <option>AccountType..</option>
             <option>SavingAccount</option>
-            <option>CurrentAccount</option>
+        </select>
+
+        <label for="category">Category</label>
+        <select type="text" id="category" required name="category">
+            <option>Category..</option>
+            <option>Children</option>
+            <option>Teen</option>
+            <option>Adult(18+)</option>
+            <option>Senior(60+)</option>
         </select>
 
         <label for="customername">CustomerName</label>
@@ -75,14 +82,14 @@
         <input type="tel" pattern="[0-9]{10}" id="customerphoneno" required name="customerphoneno" placeholder="CustomerPhoneNo..">
 
         <label for="branchname">BranchName</label>
-            <select type="text" id="branchname" required name="branchname">
-                <option>BranchName..</option>
-                <option>Jaffna</option>
-                <option>Kaithadi</option>
-                <option>Nallur</option>
-                <option>Kobai</option>
-                <option>Kokuvil</option>
-            </select>
+        <select type="text" id="branchname" required name="branchname">
+            <option>BranchName..</option>
+            <option>Jaffna</option>
+            <option>Kaithadi</option>
+            <option>Nallur</option>
+            <option>Kobai</option>
+            <option>Kokuvil</option>
+        </select>
 
 
         <input type="submit" value="Submit">
@@ -114,9 +121,9 @@ if(!empty($_POST)) {
 
     //$db->query("insert into ")
 
-  //  var_dump($db->query("select last_insert_id() from account")->fetch_object());
+    //  var_dump($db->query("select last_insert_id() from account")->fetch_object());
 
 }
 //insert into account (AccountNo,BranchID,AccountType) values
-  //  ('160001',(select branchID from branch where branchName='Jaffna'),'SavingAccount')
+//  ('160001',(select branchID from branch where branchName='Jaffna'),'SavingAccount')
 ?>
