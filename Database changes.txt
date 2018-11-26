@@ -1,0 +1,24 @@
+
+Aathman
+====================================================
+loanapplications Approved default 0
+loan loanID int auto_increment primary key
+
+DELIMITER $$
+        CREATE TRIGGER checkApproved 
+        AFTER UPDATE 
+        ON loanapplications
+        FOR EACH ROW
+        BEGIN
+          if (NEW.Approved=1) THEN 
+             insert into 
+          END IF;
+        END $$
+  DELIMITER ;
+ ======================================================
+
+ Thineshan
+ ======================================================
+
+ =======================================================
+

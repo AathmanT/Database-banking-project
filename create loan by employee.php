@@ -1,8 +1,25 @@
+<?php
+
+$db=new mysqli('localhost','root','','banking');
+
+if(!empty($_POST)) {
+
+    $sender = $_POST['AccountNo'];
+    $reciever = $_POST['LoanType'];
+    $amount = $_POST['RepayYears'];
+    $TransactionID = $_POST['Amount'];
+
+    $db->query("insert into loanapplications (LoanType,AccountNo,EmployeeID,RepayYears,Amount) values
+ ('{$_POST['LoanType']}','{$_POST['AccountNo']}','160001','{$_POST['RepayYears']}','{$_POST['Amount']}')");
+}
+
+?>
+
 <!DOCTYPE html>
 <html>
 <style>
 
-    #Loan type{
+    #LoanType{
         width: 100%;
         padding: 12px 20px;
         margin: 8px 0;
@@ -62,15 +79,14 @@
 
 <div>
     <form action="" method="post">
-        <label for="Account no">Account no</label>
-        <input type="text" id="Account no" name="Account no" placeholder="Account no..">
+        <label for="AccountNo">Account no</label>
+        <input type="text" id="AccountNo" name="AccountNo" placeholder="Account no..">
 
-        <label for="Loan type">Loan type</label>
-        <select id="Loan type" name="Loan type">
-            <option value="volvo">Business</option>
-            <option value="saab">Personal</option>
+        <label for="LoanType">Loan type</label>
+        <select id="LoanType" name="LoanType">
+            <option value="Business">Business</option>
+            <option value="Personal">Personal</option>
         </select>
-
 
 
         <label for="RepayYears">RepayYears</label>
@@ -83,17 +99,3 @@
     </form>
 </div>
 
-<?php
-
-$db=new mysqli('localhost','root','','banking');
-
-if(!empty($_POST)) {
-
-    $sender = $_POST['sender'];
-    $reciever = $_POST['reciever'];
-    $amount = $_POST['amount'];
-    $TransactionID = $_POST['TransactionID'];
-
-    $db->query("insert into transactions (TransactionID,Amount,Date_Time,Type) values
- ('{$_POST['TransactionID']}','{$_POST['amount']}',NOW(),'Online')");
-}
