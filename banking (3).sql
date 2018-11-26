@@ -32,7 +32,8 @@ CREATE TABLE `account` (
   `AccountNo` int auto_increment PRIMARY  KEY ,
   `Balance` double DEFAULT NULL,
   `BranchID` int,
-  `AccountType` enum('SavingAccount',' CurrentAccount') DEFAULT NULL
+  `AccountType` enum('SavingAccount',' CurrentAccount') DEFAULT NULL,
+  `PlanID` int
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -381,7 +382,8 @@ INSERT INTO `transactions` (`TransactionID`, `Amount`, `Date_Time`, `Type`) VALU
 -- Indexes for table `account`
 --
 ALTER TABLE `account`
-  ADD KEY `BranchID` (`BranchID`);
+  ADD KEY `BranchID` (`BranchID`),
+  ADD KEY `PlanID` (`PlanID`);
 
 --
 -- Indexes for table `atm`
@@ -544,7 +546,8 @@ ALTER TABLE `loaninstallment`
 -- Constraints for table `account`
 --
 ALTER TABLE `account`
-  ADD CONSTRAINT `account_ibfk_1` FOREIGN KEY (`BranchID`) REFERENCES `branch` (`BranchID`);
+  ADD CONSTRAINT `account_ibfk_1` FOREIGN KEY (`PlanID`) REFERENCES `savingplan` (`PlanID`),
+  ADD CONSTRAINT `account_ibfk_2` FOREIGN KEY (`BranchID`) REFERENCES `branch` (`BranchID`);
 
 --
 -- Constraints for table `atm`
@@ -615,6 +618,8 @@ ALTER TABLE `onlineloan`
 --
 ALTER TABLE `onlinetransaction`
   ADD CONSTRAINT `onlinetransaction_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `transactions` (`TransactionID`);
+
+
 
 --
 -- Constraints for table `savingaccount`
