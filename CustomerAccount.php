@@ -121,6 +121,7 @@ if(!empty($_POST)) {
     $db->query("insert into account (BranchID,AccountType) values
  ((select branchID from branch where branchName='{$_POST['branchname']}'),'{$_POST['accounttype']}')");
 
+    $db->query("update account  set PlanID =(select PlanID from savingplan where category='{$_POST['category']}')");
     //$db->query("insert into account()")
 
     //$db->query("insert into ")
