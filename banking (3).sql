@@ -31,17 +31,13 @@ SET time_zone = "+00:00";
 CREATE TABLE `account` (
   `AccountNo` int auto_increment PRIMARY  KEY ,
   `Balance` double DEFAULT NULL,
-  `BranchID` varchar(30) DEFAULT NULL,
+  `BranchID` int,
   `AccountType` enum('SavingAccount',' CurrentAccount') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `account`
 --
-
-INSERT INTO `account` (`Balance`, `BranchID`, `AccountType`) VALUES
-(800, '10', 'SavingAccount'),
-(600, '10', 'SavingAccount');
 
 -- --------------------------------------------------------
 
@@ -51,7 +47,7 @@ INSERT INTO `account` (`Balance`, `BranchID`, `AccountType`) VALUES
 
 CREATE TABLE `atm` (
   `atmID` varchar(30) NOT NULL,
-  `BranchID` varchar(30) DEFAULT NULL
+  `BranchID` int
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -73,7 +69,7 @@ CREATE TABLE `atmtransaction` (
 --
 
 CREATE TABLE `branch` (
-  `BranchID` varchar(30) NOT NULL,
+  `BranchID` int primary key,
   `BranchType` enum('Head Office','Area Branch') DEFAULT NULL,
   `BranchName` varchar(30) DEFAULT NULL,
   `BranchCity` varchar(30) DEFAULT NULL
@@ -83,8 +79,6 @@ CREATE TABLE `branch` (
 -- Dumping data for table `branch`
 --
 
-INSERT INTO `branch` (`BranchID`, `BranchType`, `BranchName`, `BranchCity`) VALUES
-('10', 'Area Branch', 'Colombo', 'Moratuwa');
 
 -- --------------------------------------------------------
 
@@ -121,7 +115,7 @@ CREATE TABLE `customer_account` (
 
 CREATE TABLE `employee` (
   `EmployeeID` varchar(30) NOT NULL,
-  `BranchID` varchar(30) DEFAULT NULL,
+  `BranchID` int,
   `EmpName` varchar(30) DEFAULT NULL,
   `EmpAddress` varchar(30) DEFAULT NULL,
   `EmpEmail` varchar(30) DEFAULT NULL,
@@ -132,8 +126,6 @@ CREATE TABLE `employee` (
 -- Dumping data for table `employee`
 --
 
-INSERT INTO `employee` (`EmployeeID`, `BranchID`, `EmpName`, `EmpAddress`, `EmpEmail`, `EmpPhoneNo`) VALUES
-('160001', '10', 'Tony', 'Malibu', 'tony', 1221212);
 
 -- --------------------------------------------------------
 
@@ -406,9 +398,7 @@ ALTER TABLE `atmtransaction`
 
 --
 -- Indexes for table `branch`
---
-ALTER TABLE `branch`
-  ADD PRIMARY KEY (`BranchID`);
+
 
 --
 -- Indexes for table `customer`
