@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `account` (
-  `AccountNo` varchar(30) NOT NULL,
+  `AccountNo` int auto_increment PRIMARY  KEY ,
   `Balance` double DEFAULT NULL,
   `BranchID` varchar(30) DEFAULT NULL,
   `AccountType` enum('SavingAccount',' CurrentAccount') DEFAULT NULL
@@ -39,9 +39,9 @@ CREATE TABLE `account` (
 -- Dumping data for table `account`
 --
 
-INSERT INTO `account` (`AccountNo`, `Balance`, `BranchID`, `AccountType`) VALUES
-('160001', 800, '10', 'SavingAccount'),
-('160002', 600, '10', 'SavingAccount');
+INSERT INTO `account` (`Balance`, `BranchID`, `AccountType`) VALUES
+(800, '10', 'SavingAccount'),
+(600, '10', 'SavingAccount');
 
 -- --------------------------------------------------------
 
@@ -62,7 +62,7 @@ CREATE TABLE `atm` (
 
 CREATE TABLE `atmtransaction` (
   `TransactionID` varchar(30) NOT NULL,
-  `AccountNo` varchar(30) DEFAULT NULL,
+  `AccountNo` int DEFAULT NULL,
   `atmID` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -110,7 +110,7 @@ CREATE TABLE `customer` (
 
 CREATE TABLE `customer_account` (
   `CustomerID` int NOT NULL,
-  `AccountNo` varchar(30) NOT NULL
+  `AccountNo` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -155,7 +155,7 @@ CREATE TABLE `fdplan` (
 
 CREATE TABLE `fixeddeposit` (
   `FixedID` varchar(30) NOT NULL,
-  `SavingNo` varchar(30) DEFAULT NULL,
+  `SavingNo` int DEFAULT NULL,
   `FDAmount` varchar(30) DEFAULT NULL,
   `InterestRate` double DEFAULT NULL,
   `OpeningDate` date DEFAULT NULL,
@@ -183,7 +183,7 @@ CREATE TABLE `lateloanreport` (
 CREATE TABLE `loan` (
   `LoanID` int(11) NOT NULL,
   `InstallmentID` int(11) DEFAULT NULL,
-  `AccountNo` varchar(30) DEFAULT NULL,
+  `AccountNo` int DEFAULT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
   `LoanAmount` float(30,2) DEFAULT NULL,
   `InterestRate` float(10,2) DEFAULT NULL
@@ -198,7 +198,7 @@ CREATE TABLE `loan` (
 CREATE TABLE `loanapplications` (
   `ApplicationID` int(11) NOT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
-  `AccountNo` varchar(30) DEFAULT NULL,
+  `AccountNo` int,
   `EmployeeID` varchar(30) DEFAULT NULL,
   `RepayYears` int(4) DEFAULT NULL,
   `Amount` float(30,2) DEFAULT NULL,
@@ -209,8 +209,7 @@ CREATE TABLE `loanapplications` (
 -- Dumping data for table `loanapplications`
 --
 
-INSERT INTO `loanapplications` (`ApplicationID`, `LoanType`, `AccountNo`, `EmployeeID`, `RepayYears`, `Amount`, `Approved`) VALUES
-(12, '', '160001', '160001', 3, 10000.00, 1);
+
 
 --
 -- Triggers `loanapplications`
@@ -325,7 +324,7 @@ INSERT INTO `onlinetransaction` (`TransactionID`, `SenderAccNo`, `RecieverAccNo`
 
 CREATE TABLE `savingaccount` (
   `NoOfWithdrawals` int(11) DEFAULT NULL,
-  `AccountNo` varchar(30) NOT NULL,
+  `AccountNo` int ,
   `PlanID` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -389,7 +388,6 @@ INSERT INTO `transactions` (`TransactionID`, `Amount`, `Date_Time`, `Type`) VALU
 -- Indexes for table `account`
 --
 ALTER TABLE `account`
-  ADD PRIMARY KEY (`AccountNo`),
   ADD KEY `BranchID` (`BranchID`);
 
 --
