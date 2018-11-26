@@ -1,8 +1,15 @@
 
 Aathman
 ====================================================
-loanapplications Approved default 0
-loan loanID int auto_increment primary key
+Change loanapplications Approved default 0
+Change loan loanID int auto_increment primary key
+Remove loaninstallment PaymentPeriod
+Change loaninstallment installmentID auto_increment primary key
+Change loaninstallment MonthlyAmount float(10,2) DEFAULT 0
+Change loanapplications RepayYears to RepayMonths
+Add Account Created DateTime
+Remove loan Manual_Online
+Remove table loaninstallment and join with loan
 
 DELIMITER $$
         CREATE TRIGGER checkApproved 
@@ -11,7 +18,8 @@ DELIMITER $$
         FOR EACH ROW
         BEGIN
           if (NEW.Approved=1) THEN 
-             insert into 
+             insert into loaninstallment (MonthlyAmount,InstallmentRemaining)
+             values ((new.amount+ new.amount*0.12*new.RepayYears*12)/(new.RepayYears*12),new.RepayYears*12);
           END IF;
         END $$
   DELIMITER ;
