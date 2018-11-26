@@ -30,7 +30,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `account` (
   `AccountNo` int auto_increment PRIMARY  KEY ,
-  `Balance` double DEFAULT NULL,
+  `Balance` double DEFAULT 0,
   `BranchID` int,
   `AccountType` enum('SavingAccount',' CurrentAccount') DEFAULT NULL,
   `PlanID` int
@@ -80,7 +80,13 @@ CREATE TABLE `branch` (
 -- Dumping data for table `branch`
 --
 
-
+insert into `branch` (`BranchType`,`BranchName`,`BranchCity`) VALUES
+('Head Office','Jaffna','Jaffna'),
+('Area Branch','Nallur','Jaffna'),
+('Head Office','Mankulam','Vavuniya'),
+('Area Branch','Kaithadi','Jaffna'),
+('Head Branch','Kobai','Trinco'),
+('Area Branch','Kokuvil','Baticola');
 -- --------------------------------------------------------
 
 --
@@ -334,6 +340,15 @@ CREATE TABLE `savingplan` (
   `MinimumAmount` int(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `savingplan`
+--
+
+insert into `savingplan` (`Category`,`InterestRate`,`MinimumAmount`) VALUES
+('Children',12,0),
+('Teen',11,500),
+('Adult(18+)',10,1000),
+('Senior(60+)',13,1000);
 -- --------------------------------------------------------
 
 --
