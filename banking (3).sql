@@ -32,7 +32,7 @@ CREATE TABLE `account` (
   `AccountNo` int auto_increment PRIMARY  KEY ,
   `Balance` double DEFAULT 0,
   `BranchID` int,
-  `AccountType` enum('SavingAccount',' CurrentAccount') DEFAULT NULL,
+  `AccountType` enum('SavingAccount','CurrentAccount') DEFAULT NULL,
   `PlanID` int
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -348,7 +348,8 @@ insert into `savingplan` (`Category`,`InterestRate`,`MinimumAmount`) VALUES
 ('Children',12,0),
 ('Teen',11,500),
 ('Adult(18+)',10,1000),
-('Senior(60+)',13,1000);
+('Senior(60+)',13,1000),
+('NoInterest',0,5000);
 -- --------------------------------------------------------
 
 --
