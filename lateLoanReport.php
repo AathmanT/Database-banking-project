@@ -77,9 +77,10 @@ if(!empty($_POST)){
 // $db->multi_query("start transaction;update account set balance=balance+'{$_POST['amount']}' where AccountNo= '{$_POST['reciever']}';
 // update account set balance=balance-'{$_POST['amount']}' where AccountNo= '{$_POST['sender']}';commit;");
  
- 
 
-if($results=$db->query("SELECT AccountNo from  loansettlement left join loan using(LoanID) left join account using(AccountNo) where BranchID=1 and PaidOnTime=0 and DueDate between '{$_POST['StartDate']}' and '{$_POST['EndDate']}'")){
+
+//if($results=$db->query("SELECT AccountNo,DateTime,DueDate from  loansettlement left join loan using(LoanID) left join account using(AccountNo) where BranchID=2 and PaidOnTime=0 and DueDate between '2018-10-01' and '2018-12-01'")){
+    if($results=$db->query("SELECT AccountNo,DateTime,DueDate from  loansettlement left join loan using(LoanID) left join account using(AccountNo) where BranchID=2 and PaidOnTime=0 and DueDate between '{$_POST['StartDate']}' and '{$_POST['EndDate']}'")){
 	if($results->num_rows){
 		while($row=$results->fetch_object()){
 			$records[]=$row;
@@ -93,8 +94,9 @@ if($results=$db->query("SELECT AccountNo from  loansettlement left join loan usi
     <table>
         <thead>
             <tr>
-                <th>TransactionID</th>
-                <th>Amount</th>
+                <th>AccountNo</th>
+                <th>PaidTime</th>
+                <th>DueDate</th>
             </tr>
         </thead>
         <tbody> 
@@ -103,8 +105,9 @@ if($results=$db->query("SELECT AccountNo from  loansettlement left join loan usi
 				$i++;
 		?>
 			<tr>
-				<td><?php echo $r->TransactionID;?></td>
-				<td><?php echo $r->Amount;?></td>
+				<td><?php echo $r->AccountNo;?></td>
+				<td><?php echo $r->DateTime;?></td>
+                <td><?php echo $r->DueDate;?></td>
 			</tr>
 		<?php
 		}

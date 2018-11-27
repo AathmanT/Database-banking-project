@@ -48,6 +48,17 @@ DELIMITER $$
     end $$
     delimiter ;
 
+    DELIMITER $$
+              CREATE TRIGGER reduceInstallment
+              after insert
+              ON loansettlement
+              FOR EACH ROW
+              BEGIN
+                update loan set InstallmentRemaining=InstallmentRemaining-1 where LoanID=new.LoanID;
+
+              END $$
+        DELIMITER ;
+
  ======================================================
 
  Thineshan

@@ -1,0 +1,4 @@
+Create view for branchmanger
+
+Branch wise late loan installment report
+Only branch managers can view these reports.
