@@ -86,8 +86,9 @@
         <select type="text" id="branchname" required name="branchname">
             <option>BranchName..</option>
             <option>Jaffna</option>
-            <option>Kaithadi</option>
             <option>Nallur</option>
+            <option>Mankulam</option>
+            <option>Kaithadi</option>
             <option>Kobai</option>
             <option>Kokuvil</option>
         </select>
@@ -118,10 +119,11 @@ if(!empty($_POST)) {
  ('{$_POST['customername']}','{$_POST['customeraddress']}','{$_POST['dateofbirth']}','{$_POST['NIC']}','{$_POST['customeremail']}',
  '{$_POST['customerphoneno']}')");
 
-    $db->query("insert into account (BranchID,AccountType) values
- ((select branchID from branch where branchName='{$_POST['branchname']}'),'{$_POST['accounttype']}')");
+    $db->query("insert into account (BranchID,AccountType,PlanID) values
+ ((select branchID from branch where branchName='{$_POST['branchname']}'),'{$_POST['accounttype']}',(select PlanID from savingplan where category='{$_POST['category']}'))");
 
-    $db->query("update account  set PlanID =(select PlanID from savingplan where category='{$_POST['category']}')");
+
+    //$db->query("update account  set PlanID =(select PlanID from savingplan where category='{$_POST['category']}')");
     //$db->query("insert into account()")
 
     //$db->query("insert into ")
