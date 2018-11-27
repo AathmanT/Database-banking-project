@@ -170,7 +170,7 @@ CREATE TABLE `fixeddeposit` (
 CREATE TABLE `lateloanreport` (
   `ReportID` varchar(30) DEFAULT NULL,
   `Date` datetime DEFAULT NULL,
-  `SettlementID` varchar(30) DEFAULT NULL
+  `SettlementID` int
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -181,7 +181,6 @@ CREATE TABLE `lateloanreport` (
 
 CREATE TABLE `loan` (
   `LoanID` int auto_increment primary key,
-  `InstallmentID` int(11) DEFAULT NULL,
   `AccountNo` int DEFAULT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
   `LoanAmount` float(30,2) DEFAULT NULL,
@@ -245,7 +244,7 @@ DELIMITER ;
 --
 
 CREATE TABLE `loansettlement` (
-  `SettlementID` varchar(30) NOT NULL,
+  `SettlementID` int auto_increment primary key,
   `LoanID` int,
   `DateTime` date DEFAULT NULL,
   `DueDate` date NOT NULL,
@@ -475,7 +474,6 @@ ALTER TABLE `loanapplications`
 -- Indexes for table `loansettlement`
 --
 ALTER TABLE `loansettlement`
-  ADD PRIMARY KEY (`SettlementID`),
   ADD KEY `LoanID` (`LoanID`);
 
 --

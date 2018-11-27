@@ -23,6 +23,31 @@ DELIMITER $$
           END IF;
         END $$
   DELIMITER ;
+
+  DELIMITER $$
+          CREATE TRIGGER checkPaidOnTime
+          before insert
+          ON loansettlement
+          FOR EACH ROW
+          BEGIN
+            set new.PaidOntime=checkPaidOnTime(new.DateTime,new.DueDate);
+
+          END $$
+    DELIMITER ;
+
+    delimiter $$
+    create function checkPaidOnTime(PaidDate Date,DueDate Date)
+    returns int
+    begin
+         declare result int;
+        if (PaidDate<DueDate) then
+            set result=1;
+        else set result=0;
+        end if;
+         return result;
+    end $$
+    delimiter ;
+
  ======================================================
 
  Thineshan
