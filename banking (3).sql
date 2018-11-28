@@ -141,10 +141,17 @@ CREATE TABLE `employee` (
 --
 
 CREATE TABLE `fdplan` (
-  `FDPlanID` varchar(30) NOT NULL,
-  `InterestRate` double DEFAULT NULL,
-  `Period` int(11) DEFAULT NULL
+                        `FDPlanID` int(11) NOT NULL,
+                        `InterestRate` double DEFAULT NULL,
+                        `Period` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `fdplan`
+--
+
+INSERT INTO `fdplan` (`FDPlanID`, `InterestRate`, `Period`) VALUES
+(1, 16, 5);
 
 -- --------------------------------------------------------
 
@@ -153,13 +160,33 @@ CREATE TABLE `fdplan` (
 --
 
 CREATE TABLE `fixeddeposit` (
-  `FixedID` varchar(30) NOT NULL,
-  `SavingNo` int,
-  `FDAmount` varchar(30) DEFAULT NULL,
-  `InterestRate` double DEFAULT NULL,
-  `OpeningDate` date DEFAULT NULL,
-  `FDPlanID` varchar(30) DEFAULT NULL
+                              `FixedID` int(11) NOT NULL,
+                              `SavingNo` varchar(30) DEFAULT NULL,
+                              `FDAmount` varchar(30) DEFAULT NULL,
+                              `OpeningDate` date DEFAULT NULL,
+                              `FDPlanID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `fixeddeposit`
+--
+
+INSERT INTO `fixeddeposit` (`FixedID`, `SavingNo`, `FDAmount`, `OpeningDate`, `FDPlanID`) VALUES
+(1, '160001', '1266', NULL, 1);
+
+--
+-- Triggers `fixeddeposit`
+--
+DELIMITER $$
+CREATE TRIGGER `checkAccountNo` BEFORE INSERT ON `fixeddeposit` FOR EACH ROW BEGIN
+if ( (SELECT COUNT(savingaccount.AccountNo) FROM savingaccount
+WHERE savingaccount.AccountNo =NEW.SavingNo) =0) THEN
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'saving account no not found ';
+END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -281,8 +308,8 @@ CREATE TABLE `manager` (
 --
 
 CREATE TABLE `onlineloan` (
-  `LoanID` int ,
-  `FixedID` varchar(30) DEFAULT NULL
+                            `LoanID` int(11) NOT NULL,
+                            `FixedID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -321,6 +348,13 @@ CREATE TABLE `savingaccount` (
   `AccountNo` int ,
   `PlanID` int
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `savingaccount`
+--
+
+INSERT INTO `savingaccount` (`NoOfWithdrawals`, `AccountNo`, `PlanID`) VALUES
+(6, '160001', '1');
 
 -- --------------------------------------------------------
 
@@ -510,6 +544,7 @@ ALTER TABLE `savingaccount`
 --
 -- Indexes for table `savingplan`
 --
+ALTER
 
 --
 -- Indexes for table `transactionreport`
@@ -528,7 +563,22 @@ ALTER TABLE `transactions`
 --
 
 --
+-- AUTO_INCREMENT for table `fdplan`
+--
+ALTER TABLE `fdplan`
+  MODIFY `FDPlanID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
+--
+-- AUTO_INCREMENT for table `fixeddeposit`
+--
+ALTER TABLE `fixeddeposit`
+  MODIFY `FixedID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `loan`
+--
+ALTER TABLE `loan`
+  MODIFY `LoanID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `loanapplications`
