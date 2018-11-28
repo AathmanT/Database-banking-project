@@ -314,38 +314,27 @@ INSERT INTO `onlinetransaction` (`TransactionID`, `SenderAccNo`, `RecieverAccNo`
 -- --------------------------------------------------------
 
 --
--- Table structure for table `savingaccount`
+-- Table structure for table `plan`
 --
 
-CREATE TABLE `savingaccount` (
-  `NoOfWithdrawals` int(11) DEFAULT NULL,
-  `AccountNo` int ,
-  `PlanID` int
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `savingplan`
---
-
-CREATE TABLE `savingplan` (
+CREATE TABLE `plan` (
   `PlanID` int auto_increment primary key,
   `Category` varchar(30) DEFAULT  NULL,
   `InterestRate` double DEFAULT NULL,
-  `MinimumAmount` int(30) DEFAULT NULL
+  `MinimumAmount` int(30) DEFAULT NULL,
+  `NoOfWithdrawals` int
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `savingplan`
+-- Dumping data for table `plan`
 --
 
-insert into `savingplan` (`Category`,`InterestRate`,`MinimumAmount`) VALUES
-('Children',12,0),
-('Teen',11,500),
-('Adult(18+)',10,1000),
-('Senior(60+)',13,1000),
-('NoInterest',0,5000);
+insert into `plan` (`Category`,`InterestRate`,`MinimumAmount`,`NoOfWithdrawals`) VALUES
+('Children',12,0,0),
+('Teen',11,500,10),
+('Adult(18+)',10,1000,15),
+('Senior(60+)',13,1000,12),
+('NoInterest',0,5000,20);
 -- --------------------------------------------------------
 
 --
@@ -503,16 +492,8 @@ ALTER TABLE `onlineloan`
 ALTER TABLE `onlinetransaction`
   ADD PRIMARY KEY (`TransactionID`);
 
---
--- Indexes for table `savingaccount`
---
-ALTER TABLE `savingaccount`
-  ADD PRIMARY KEY (`AccountNo`),
-  ADD KEY `PlanID` (`PlanID`);
 
---
--- Indexes for table `savingplan`
---
+
 
 --
 -- Indexes for table `transactionreport`
@@ -550,7 +531,7 @@ ALTER TABLE `loanapplications`
 -- Constraints for table `account`
 --
 ALTER TABLE `account`
-  ADD CONSTRAINT `account_ibfk_1` FOREIGN KEY (`PlanID`) REFERENCES `savingplan` (`PlanID`),
+  ADD CONSTRAINT `account_ibfk_1` FOREIGN KEY (`PlanID`) REFERENCES `plan` (`PlanID`),
   ADD CONSTRAINT `account_ibfk_2` FOREIGN KEY (`BranchID`) REFERENCES `branch` (`BranchID`);
 
 --
@@ -576,7 +557,7 @@ ALTER TABLE `employee`
 -- Constraints for table `fixeddeposit`
 --
 ALTER TABLE `fixeddeposit`
-  ADD CONSTRAINT `fixeddeposit_ibfk_1` FOREIGN KEY (`SavingNo`) REFERENCES `savingaccount` (`AccountNo`),
+  ADD CONSTRAINT `fixeddeposit_ibfk_1` FOREIGN KEY (`SavingNo`) REFERENCES `account` (`AccountNo`),
   ADD CONSTRAINT `fixeddeposit_ibfk_2` FOREIGN KEY (`FDPlanID`) REFERENCES `fdplan` (`FDPlanID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
@@ -622,12 +603,7 @@ ALTER TABLE `onlineloan`
 --
 ALTER TABLE `onlinetransaction`
   ADD CONSTRAINT `onlinetransaction_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `transactions` (`TransactionID`);
---
--- Constraints for table `savingaccount`
---
-ALTER TABLE `savingaccount`
-  ADD CONSTRAINT `savingaccount_ibfk_1` FOREIGN KEY (`AccountNo`) REFERENCES `account` (`AccountNo`),
-  ADD CONSTRAINT `savingaccount_ibfk_2` FOREIGN KEY (`PlanID`) REFERENCES `savingplan` (`PlanID`);
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
