@@ -121,7 +121,8 @@ if(!empty($_POST)) {
     $db->query("insert into account (BranchID,AccountType,PlanID) values
  ((select branchID from branch where branchName='{$_POST['branchname']}'),'{$_POST['accounttype']}',(select PlanID from savingplan where category='{$_POST['category']}'))");
 
-    $db->query("insert into customer_account (CustomerID,AccountNo) values ((select max(CustomerID) from customer),(select max(AccountNo) from account))");
+    $db->query("insert into customer_account (CustomerID,AccountNo) values (last_insert_id(),last_insert_id())");
+    //$db->query("insert into customer_account (CustomerID,AccountNo) values ((select max(CustomerID) from customer),(select max(AccountNo) from account))");
 
     //INSERT INTO customer_account(CustomerID,AccountNo) VALUES ( (SELECT MAX(CustomerID) FROM Customer),(SELECT MAX(AccountNo) FROM account));
     //$db->query("update account  set PlanID =(select PlanID from savingplan where category='{$_POST['category']}')");
