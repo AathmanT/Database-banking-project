@@ -87,7 +87,7 @@ INSERT INTO `account` (`AccountNo`, `Balance`, `BranchID`, `AccountType`, `PlanI
 
 CREATE TABLE `atm` (
                      `atmID` int auto_increment PRIMARY key,
-                     `BranchID` varchar(30) DEFAULT NULL
+                     `BranchID` int not NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -206,25 +206,17 @@ CREATE TABLE `fdplan` (
                         `Period` int(11) not NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `fdplan`
---
-
-INSERT INTO `fdplan` (`FDPlanID`, `InterestRate`, `Period`) VALUES
-(1, 16, 5);
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `fixeddeposit`
 --
 
 CREATE TABLE `fixeddeposit` (
-                              `FixedID` int auto_increment PRIMARY key,
-                              `SavingNo` varchar(30) DEFAULT NULL,
-                              `FDAmount` float (10,2) not null ,
-                              `OpeningDate` date not NULL,
-                              `FDPlanID` int NOT NULL
+    `FixedID` int auto_increment PRIMARY key,
+    `SavingNo` int not NULL,
+    `FDAmount` float (10,2) not null ,
+    `OpeningDate` date not NULL,
+    `FDPlanID` int NOT NULL
 
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -245,19 +237,14 @@ UPDATE account set account.Balance= (account.Balance+
 UPDATE fixeddeposit set fixeddeposit.UpdatedDate = (2018-11-12);
 */
 
-INSERT INTO `fixeddeposit` (`FixedID`, `SavingNo`, `FDAmount`, `OpeningDate`, `FDPlanID`) VALUES (NULL, '160001', '1266', '2018-11-07', '1');
---
--- Dumping data for table `fixeddeposit`
---
-
 
 --
 -- Triggers `fixeddeposit`
 --
 DELIMITER $$
 CREATE TRIGGER `checkAccountNoFD` BEFORE INSERT ON `fixeddeposit` FOR EACH ROW BEGIN
-if ( (SELECT COUNT(savingaccount.AccountNo) FROM savingaccount
-WHERE savingaccount.AccountNo =NEW.SavingNo) =0) THEN
+if ( (SELECT COUNT(account.AccountNo) FROM account
+WHERE account.AccountNo =NEW.SavingNo) =0) THEN
 
 SIGNAL SQLSTATE '45000'
 SET MESSAGE_TEXT = 'saving account no not found ';
@@ -266,14 +253,6 @@ END
 $$
 DELIMITER ;
 
-
-
--- ----------------------
--- --------------------------------------------------------
-
-
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `loan`
@@ -463,14 +442,6 @@ END
 $$
 DELIMITER ;
 
-INSERT INTO `onlinetransaction` (`TransactionID`, `SenderAccNo`, `RecieverAccNo`) VALUES
-('2', '160001', '160002'),
-('3', '160001', '160002'),
-('4', '160001', '160002'),
-('5', '160001', '160002'),
-('6', '160001', '160002'),
-('7', '160001', '160002'),
-('8', '160001', '160002');
 
 
 -- --------------------------------------------------------
@@ -522,23 +493,12 @@ CREATE TABLE `transactionreport` (
 --
 
 CREATE TABLE `transactions` (
-                              `TransactionID` int auto_increment PRIMARY key,
-                              `Amount` float(10,2) not NULL,
-  `Date_Time` datetime not NULL,
-  `Type` enum('Online','ATM') not NULL
+    `TransactionID` int auto_increment PRIMARY key,
+    `Amount` float(10,2) not NULL,
+    `Date_Time` datetime not NULL,
+    `Type` enum('Online','ATM') not NULL
   ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-
--- Dumping data for table `transactions`
-INSERT INTO `transactions` (`TransactionID`, `Amount`, `Date_Time`, `Type`) VALUES
-('1', 50.00, '2018-11-08 01:37:25', 'Online'),
-('2', 50.00, '2018-11-08 01:46:35', 'Online'),
-('3', 50.00, '2018-11-08 01:53:39', 'Online'),
-('4', 100.00, '2018-11-08 02:48:38', 'Online'),
-('5', 1.00, '2018-11-08 10:47:20', 'Online'),
-('6', 50.00, '2018-11-08 10:48:09', 'Online'),
-('7', 100.00, '2018-11-08 10:49:30', 'Online'),
-('8', 50.00, '2018-11-08 10:51:56', 'Online');
 
 
 -- Indexes for dumped tables
