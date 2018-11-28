@@ -203,9 +203,6 @@ CREATE TABLE `fixeddeposit` (
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `lateloanreport`
---
 
 
 -- --------------------------------------------------------
@@ -270,7 +267,7 @@ CREATE TABLE `loanapplications` (
   `ApplicationID` int(11) NOT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
   `AccountNo` int,
-  `EmployeeID` varchar(30) DEFAULT NULL,
+  `EmployeeID` varchar(30) not NULL,
   `RepayYears` int(4) DEFAULT NULL,
   `Amount` float(30,2) DEFAULT NULL,
   `Approved` tinyint(1) DEFAULT '0'
@@ -280,8 +277,7 @@ CREATE TABLE `loanapplications` (
 -- Dumping data for table `loanapplications`
 --
 
-INSERT INTO `loanapplications` (`ApplicationID`, `LoanType`, `AccountNo`, `EmployeeID`, `RepayYears`, `Amount`, `Approved`) VALUES
-(15, 'Personal Loan', 1, '', 3, 10000.00, 1);
+
 
 --
 -- Triggers `loanapplications`
@@ -528,11 +524,7 @@ ALTER TABLE `fixeddeposit`
   ADD KEY `SavingNo` (`SavingNo`),
   ADD KEY `FDPlanID` (`FDPlanID`);
 
---
--- Indexes for table `lateloanreport`
---
-ALTER TABLE `lateloanreport`
-  ADD KEY `SettlementID` (`SettlementID`);
+
 
 --
 -- Indexes for table `loan`
@@ -662,11 +654,7 @@ ALTER TABLE `fixeddeposit`
   ADD CONSTRAINT `fixeddeposit_ibfk_1` FOREIGN KEY (`SavingNo`) REFERENCES `account` (`AccountNo`),
   ADD CONSTRAINT `fixeddeposit_ibfk_2` FOREIGN KEY (`FDPlanID`) REFERENCES `fdplan` (`FDPlanID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
---
--- Constraints for table `lateloanreport`
---
-ALTER TABLE `lateloanreport`
-  ADD CONSTRAINT `lateloanreport_ibfk_1` FOREIGN KEY (`SettlementID`) REFERENCES `loansettlement` (`SettlementID`);
+
 
 --
 -- Constraints for table `loan`
