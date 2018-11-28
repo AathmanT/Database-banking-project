@@ -188,6 +188,23 @@ CREATE TABLE `fixeddeposit` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+SET GLOBAL event_scheduler = ON;
+CREATE EVENT  updateFDinterest
+ON SCHEDULE EVERY 1 MINUTE
+STARTS CURRENT_TIMESTAMP
+ENDS CURRENT_TIMESTAMP + INTERVAL 50 minute
+DO
+UPDATE account set account.Balance= (account.Balance+
+  ((SELECT FDAmount FROM fixeddeposit WHERE account.AccountNo=fixeddeposit.SavingNo)*
+    (select InterestRate from fdplan where fdplan.FDPlanID=
+  (SELECT FDPlanID FROM fixeddeposit WHERE fixeddeposit.SavingNo=account.AccountNo)) )/(100*12))
+  WHERE (account.AccountNo=(SELECT SavingNo FROM fixeddeposit WHERE SavingNo = account.AccountNo)
+  and ((CURDATE() >(select OpeningDate from fixeddeposit WHERE SavingNo = account.AccountNo) ) ));
+/*UPDATE fixeddeposit set fixeddeposit.UpdatedDate = ((select OpeningDate from fixeddeposit));
+UPDATE fixeddeposit set fixeddeposit.UpdatedDate = (2018-11-12);
+*/
+
+INSERT INTO `fixeddeposit` (`FixedID`, `SavingNo`, `FDAmount`, `OpeningDate`, `FDPlanID`) VALUES (NULL, '160001', '1266', '2018-11-07', '1');
 --
 -- Dumping data for table `fixeddeposit`
 --
