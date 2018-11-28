@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 28, 2018 at 06:57 PM
+-- Generation Time: Nov 26, 2018 at 08:53 AM
 -- Server version: 10.1.29-MariaDB
 -- PHP Version: 7.2.0
 
@@ -53,12 +53,22 @@ DELIMITER ;
 --
 
 CREATE TABLE `account` (
-  `AccountNo` int(11) NOT NULL,
-  `Balance` double DEFAULT '0',
-  `BranchID` int(11) DEFAULT NULL,
-  `AccountType` enum('SavingAccount',' CurrentAccount') DEFAULT NULL,
-  `PlanID` int(11) DEFAULT NULL
+  `AccountNo` int auto_increment PRIMARY  KEY ,
+  `Balance` double DEFAULT 0,
+  `BranchID` int not null,
+  `AccountType` enum('SavingAccount','CurrentAccount') not null,
+  `PlanID` int not null
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DELIMITER $$
+CREATE TRIGGER `checkBalance` BEFORE update ON `account` FOR EACH ROW BEGIN
+if (NEW.Balance < 0 ) THEN
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'No Balance';
+END IF;
+END
+$$
+DELIMITER ;
 
 --
 -- Dumping data for table `account`
@@ -66,8 +76,8 @@ CREATE TABLE `account` (
 
 INSERT INTO `account` (`AccountNo`, `Balance`, `BranchID`, `AccountType`, `PlanID`) VALUES
 (1, 50000, 2, 'SavingAccount', 3),
-(2, 0, 1, 'SavingAccount', 1),
-(3, 0, 1, '', NULL);
+(2, 0, 1, 'SavingAccount', 1);
+
 
 -- --------------------------------------------------------
 
@@ -76,8 +86,8 @@ INSERT INTO `account` (`AccountNo`, `Balance`, `BranchID`, `AccountType`, `PlanI
 --
 
 CREATE TABLE `atm` (
-  `atmID` varchar(30) NOT NULL,
-  `BranchID` int(11) DEFAULT NULL
+                     `atmID` int auto_increment PRIMARY key,
+                     `BranchID` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -87,11 +97,21 @@ CREATE TABLE `atm` (
 --
 
 CREATE TABLE `atmtransaction` (
-  `TransactionID` varchar(30) NOT NULL,
-  `AccountNo` int(11) DEFAULT NULL,
-  `atmID` varchar(30) DEFAULT NULL
+                                `TransactionID` int PRIMARY key,
+                                `AccountNo` varchar(30) DEFAULT NULL,
+                                `atmID` int  not null
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+DELIMITER $$
+CREATE TRIGGER `checkAccountNo` BEFORE insert ON `atmtransaction` FOR EACH ROW BEGIN
+            if ((SELECT COUNT(account.AccountNo) FROM account
+            WHERE account.AccountNo =NEW.AccountNo) = 0  ) THEN
+   SIGNAL SQLSTATE '45000'
+   SET MESSAGE_TEXT = 'wrong account number';
+END IF;
+END
+$$
+DELIMITER ;
 -- --------------------------------------------------------
 
 --
@@ -99,24 +119,23 @@ CREATE TABLE `atmtransaction` (
 --
 
 CREATE TABLE `branch` (
-  `BranchID` int(11) NOT NULL,
+  `BranchID` int auto_increment primary key,
   `BranchType` enum('Head Office','Area Branch') DEFAULT NULL,
-  `BranchName` varchar(30) DEFAULT NULL,
-  `BranchCity` varchar(30) DEFAULT NULL
+  `BranchName` varchar(30) not NULL,
+  `BranchCity` varchar(30) not NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `branch`
 --
 
-INSERT INTO `branch` (`BranchID`, `BranchType`, `BranchName`, `BranchCity`) VALUES
-(1, 'Head Office', 'Jaffna', 'Jaffna'),
-(2, 'Area Branch', 'Nallur', 'Jaffna'),
-(3, 'Head Office', 'Mankulam', 'Vavuniya'),
-(4, 'Area Branch', 'Kaithadi', 'Jaffna'),
-(5, '', 'Kobai', 'Trinco'),
-(6, 'Area Branch', 'Kokuvil', 'Baticola');
-
+insert into `branch` (`BranchType`,`BranchName`,`BranchCity`) VALUES
+('Head Office','Jaffna','Jaffna'),
+('Area Branch','Nallur','Jaffna'),
+('Head Office','Mankulam','Vavuniya'),
+('Area Branch','Kaithadi','Jaffna'),
+('Head Branch','Kobai','Trinco'),
+('Area Branch','Kokuvil','Baticola');
 -- --------------------------------------------------------
 
 --
@@ -124,11 +143,11 @@ INSERT INTO `branch` (`BranchID`, `BranchType`, `BranchName`, `BranchCity`) VALU
 --
 
 CREATE TABLE `customer` (
-  `CustomerID` int(11) NOT NULL,
-  `CustomerName` varchar(30) DEFAULT NULL,
-  `CustomerAddress` varchar(30) DEFAULT NULL,
-  `DateOfBirth` date DEFAULT NULL,
-  `NIC` varchar(30) DEFAULT NULL,
+  `CustomerID` int AUTO_INCREMENT primary key,
+  `CustomerName` varchar(30) not NULL,
+  `CustomerAddress` varchar(30) not NULL,
+  `DateOfBirth` DATE not NULL,
+  `NIC` varchar(30) DEFAULT  NULL,
   `CustomerEmail` varchar(30) DEFAULT NULL,
   `CustomerPhoneNo` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -148,8 +167,8 @@ INSERT INTO `customer` (`CustomerID`, `CustomerName`, `CustomerAddress`, `DateOf
 --
 
 CREATE TABLE `customer_account` (
-  `CustomerID` int(11) NOT NULL,
-  `AccountNo` int(11) NOT NULL
+  `CustomerID` int NOT NULL,
+  `AccountNo` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -160,7 +179,7 @@ CREATE TABLE `customer_account` (
 
 CREATE TABLE `employee` (
   `EmployeeID` varchar(30) NOT NULL,
-  `BranchID` int(11) DEFAULT NULL,
+  `BranchID` int,
   `EmpName` varchar(30) DEFAULT NULL,
   `EmpAddress` varchar(30) DEFAULT NULL,
   `EmpEmail` varchar(30) DEFAULT NULL,
@@ -172,7 +191,7 @@ CREATE TABLE `employee` (
 --
 
 INSERT INTO `employee` (`EmployeeID`, `BranchID`, `EmpName`, `EmpAddress`, `EmpEmail`, `EmpPhoneNo`) VALUES
-('', 1, 'Stark', 'Malibu', 'Stark', 1221212),
+('1', 1, 'Stark', 'Malibu', 'Stark', 1221212),
 ('2', 2, 'Tony', 'Malibu', 'tony', 1221212);
 
 -- --------------------------------------------------------
@@ -182,9 +201,9 @@ INSERT INTO `employee` (`EmployeeID`, `BranchID`, `EmpName`, `EmpAddress`, `EmpE
 --
 
 CREATE TABLE `fdplan` (
-  `FDPlanID` varchar(30) NOT NULL,
-  `InterestRate` double DEFAULT NULL,
-  `Period` int(11) DEFAULT NULL
+                        `FDPlanID` int auto_increment PRIMARY key,
+                        `InterestRate` float (2,2) not null ,
+                        `Period` int(11) not NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -192,7 +211,7 @@ CREATE TABLE `fdplan` (
 --
 
 INSERT INTO `fdplan` (`FDPlanID`, `InterestRate`, `Period`) VALUES
-('1', 0.12, 24);
+(1, 16, 5);
 
 -- --------------------------------------------------------
 
@@ -201,33 +220,58 @@ INSERT INTO `fdplan` (`FDPlanID`, `InterestRate`, `Period`) VALUES
 --
 
 CREATE TABLE `fixeddeposit` (
-  `FixedID` varchar(30) NOT NULL,
-  `SavingNo` int(11) DEFAULT NULL,
-  `FDAmount` float DEFAULT NULL,
-  `InterestRate` double DEFAULT NULL,
-  `OpeningDate` date DEFAULT NULL,
-  `FDPlanID` varchar(30) DEFAULT NULL
+                              `FixedID` int auto_increment PRIMARY key,
+                              `SavingNo` varchar(30) DEFAULT NULL,
+                              `FDAmount` float (10,2) not null ,
+                              `OpeningDate` date not NULL,
+                              `FDPlanID` int NOT NULL
+
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+
+SET GLOBAL event_scheduler = ON;
+CREATE EVENT  updateFDinterest
+ON SCHEDULE EVERY 1 MINUTE
+STARTS CURRENT_TIMESTAMP
+ENDS CURRENT_TIMESTAMP + INTERVAL 50 minute
+DO
+UPDATE account set account.Balance= (account.Balance+
+  ((SELECT FDAmount FROM fixeddeposit WHERE account.AccountNo=fixeddeposit.SavingNo)*
+    (select InterestRate from fdplan where fdplan.FDPlanID=
+  (SELECT FDPlanID FROM fixeddeposit WHERE fixeddeposit.SavingNo=account.AccountNo)) )/(100*12))
+  WHERE (account.AccountNo=(SELECT SavingNo FROM fixeddeposit WHERE SavingNo = account.AccountNo)
+  and ((CURDATE() >(select OpeningDate from fixeddeposit WHERE SavingNo = account.AccountNo) ) ));
+/*UPDATE fixeddeposit set fixeddeposit.UpdatedDate = ((select OpeningDate from fixeddeposit));
+UPDATE fixeddeposit set fixeddeposit.UpdatedDate = (2018-11-12);
+*/
+
+INSERT INTO `fixeddeposit` (`FixedID`, `SavingNo`, `FDAmount`, `OpeningDate`, `FDPlanID`) VALUES (NULL, '160001', '1266', '2018-11-07', '1');
 --
 -- Dumping data for table `fixeddeposit`
 --
 
-INSERT INTO `fixeddeposit` (`FixedID`, `SavingNo`, `FDAmount`, `InterestRate`, `OpeningDate`, `FDPlanID`) VALUES
-('', 1, 833334, 0.12, '2018-11-28', '1'),
-('2', 2, 833334, 0.12, '2018-11-21', '1');
 
+--
+-- Triggers `fixeddeposit`
+--
+DELIMITER $$
+CREATE TRIGGER `checkAccountNoFD` BEFORE INSERT ON `fixeddeposit` FOR EACH ROW BEGIN
+if ( (SELECT COUNT(savingaccount.AccountNo) FROM savingaccount
+WHERE savingaccount.AccountNo =NEW.SavingNo) =0) THEN
+
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'saving account no not found ';
+END IF;
+END
+$$
+DELIMITER ;
+
+
+
+-- ----------------------
 -- --------------------------------------------------------
 
---
--- Table structure for table `lateloanreport`
---
 
-CREATE TABLE `lateloanreport` (
-  `ReportID` varchar(30) DEFAULT NULL,
-  `Date` datetime DEFAULT NULL,
-  `SettlementID` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -236,13 +280,14 @@ CREATE TABLE `lateloanreport` (
 --
 
 CREATE TABLE `loan` (
-  `LoanID` int(11) NOT NULL,
-  `AccountNo` int(11) DEFAULT NULL,
+  `LoanID` int auto_increment primary key,
+  `InstallmentID` int(11) not NULL,
+  `AccountNo` int not NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
   `LoanAmount` float(30,2) DEFAULT NULL,
   `InterestRate` float(10,2) DEFAULT NULL,
-  `MonthlyAmount` float(10,2) DEFAULT '0.00',
-  `InstallmentRemaining` int(11) DEFAULT '0'
+   `MonthlyAmount` float(10,2) DEFAULT 0,
+  `InstallmentRemaining` int DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -289,7 +334,7 @@ DELIMITER ;
 CREATE TABLE `loanapplications` (
   `ApplicationID` int(11) NOT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
-  `AccountNo` int(11) DEFAULT NULL,
+  `AccountNo` int,
   `EmployeeID` varchar(30) DEFAULT NULL,
   `RepayYears` int(4) DEFAULT NULL,
   `Amount` float(30,2) DEFAULT NULL,
@@ -300,8 +345,7 @@ CREATE TABLE `loanapplications` (
 -- Dumping data for table `loanapplications`
 --
 
-INSERT INTO `loanapplications` (`ApplicationID`, `LoanType`, `AccountNo`, `EmployeeID`, `RepayYears`, `Amount`, `Approved`) VALUES
-(15, 'Personal Loan', 1, '', 3, 10000.00, 1);
+
 
 --
 -- Triggers `loanapplications`
@@ -323,8 +367,8 @@ DELIMITER ;
 --
 
 CREATE TABLE `loansettlement` (
-  `SettlementID` int(11) NOT NULL,
-  `LoanID` int(11) DEFAULT NULL,
+  `SettlementID` int NOT NULL,
+  `LoanID` int not NULL,
   `DateTime` date DEFAULT NULL,
   `DueDate` date NOT NULL,
   `PaidOnTime` tinyint(1) DEFAULT NULL
@@ -390,7 +434,7 @@ CREATE TABLE `manager` (
 --
 
 CREATE TABLE `onlineloan` (
-  `LoanID` int(11) NOT NULL,
+  `LoanID` int ,
   `FixedID` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -401,14 +445,23 @@ CREATE TABLE `onlineloan` (
 --
 
 CREATE TABLE `onlinetransaction` (
-  `TransactionID` varchar(30) NOT NULL,
-  `SenderAccNo` varchar(30) DEFAULT NULL,
-  `RecieverAccNo` varchar(30) DEFAULT NULL
+                                   `TransactionID` int  PRIMARY key,
+                                   `SenderAccNo` varchar(30) DEFAULT NULL,
+                                   `RecieverAccNo` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
 -- Dumping data for table `onlinetransaction`
---
+DELIMITER $$
+CREATE TRIGGER `checkAccountNos` BEFORE insert ON `onlinetransaction` FOR EACH ROW BEGIN
+if ((SELECT COUNT(account.AccountNo) FROM account
+      WHERE account.AccountNo =NEW.SenderAccNo) = 0 or (SELECT COUNT(account.AccountNo)
+  FROM account
+         WHERE account.AccountNo =NEW.RecieverAccNo) = 0 ) THEN
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'wrong account numbers';
+END IF;
+END
+$$
+DELIMITER ;
 
 INSERT INTO `onlinetransaction` (`TransactionID`, `SenderAccNo`, `RecieverAccNo`) VALUES
 ('2', '160001', '160002'),
@@ -419,49 +472,36 @@ INSERT INTO `onlinetransaction` (`TransactionID`, `SenderAccNo`, `RecieverAccNo`
 ('7', '160001', '160002'),
 ('8', '160001', '160002');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `savingaccount`
---
-
-CREATE TABLE `savingaccount` (
-  `NoOfWithdrawals` int(11) DEFAULT NULL,
-  `AccountNo` int(11) NOT NULL,
-  `PlanID` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `savingaccount`
---
-
-INSERT INTO `savingaccount` (`NoOfWithdrawals`, `AccountNo`, `PlanID`) VALUES
-(2, 1, 1),
-(3, 2, 1);
 
 -- --------------------------------------------------------
+
+--
+-- Table structure for table `plan`
+--
+
 
 --
 -- Table structure for table `savingplan`
 --
 
-CREATE TABLE `savingplan` (
-  `PlanID` int(11) NOT NULL,
-  `Category` varchar(30) DEFAULT NULL,
+CREATE TABLE `plan` (
+  `PlanID` int auto_increment primary key,
+  `Category` varchar(30) DEFAULT  NULL,
   `InterestRate` double DEFAULT NULL,
-  `MinimumAmount` int(30) DEFAULT NULL
+  `MinimumAmount` int(30) DEFAULT NULL,
+  `NoOfWithdrawals` int
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `savingplan`
+-- Dumping data for table `plan`
 --
 
-INSERT INTO `savingplan` (`PlanID`, `Category`, `InterestRate`, `MinimumAmount`) VALUES
-(1, 'Children', 12, 0),
-(2, 'Teen', 11, 500),
-(3, 'Adult(18+)', 10, 1000),
-(4, 'Senior(60+)', 13, 1000);
-
+insert into `plan` (`Category`,`InterestRate`,`MinimumAmount`,`NoOfWithdrawals`) VALUES
+('Children',12,0,0),
+('Teen',11,500,10),
+('Adult(18+)',10,1000,15),
+('Senior(60+)',13,1000,12),
+('NoInterest',0,5000,20);
 -- --------------------------------------------------------
 
 --
@@ -482,18 +522,15 @@ CREATE TABLE `transactionreport` (
 --
 
 CREATE TABLE `transactions` (
-  `TransactionID` varchar(30) NOT NULL,
-  `Amount` float(30,2) DEFAULT NULL,
-  `Date_Time` datetime DEFAULT NULL,
-  `Type` enum('Online','ATM','LoanDeposit') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+                              `TransactionID` int auto_increment PRIMARY key,
+                              `Amount` float(10,2) not NULL,
+  `Date_Time` datetime not NULL,
+  `Type` enum('Online','ATM') not NULL
+  ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
+
 -- Dumping data for table `transactions`
---
-
 INSERT INTO `transactions` (`TransactionID`, `Amount`, `Date_Time`, `Type`) VALUES
-('', 10000.00, '2018-11-28 21:44:20', 'LoanDeposit'),
 ('1', 50.00, '2018-11-08 01:37:25', 'Online'),
 ('2', 50.00, '2018-11-08 01:46:35', 'Online'),
 ('3', 50.00, '2018-11-08 01:53:39', 'Online'),
@@ -503,7 +540,7 @@ INSERT INTO `transactions` (`TransactionID`, `Amount`, `Date_Time`, `Type`) VALU
 ('7', 100.00, '2018-11-08 10:49:30', 'Online'),
 ('8', 50.00, '2018-11-08 10:51:56', 'Online');
 
---
+
 -- Indexes for dumped tables
 --
 
@@ -511,7 +548,6 @@ INSERT INTO `transactions` (`TransactionID`, `Amount`, `Date_Time`, `Type`) VALU
 -- Indexes for table `account`
 --
 ALTER TABLE `account`
-  ADD PRIMARY KEY (`AccountNo`),
   ADD KEY `BranchID` (`BranchID`),
   ADD KEY `PlanID` (`PlanID`);
 
@@ -519,27 +555,22 @@ ALTER TABLE `account`
 -- Indexes for table `atm`
 --
 ALTER TABLE `atm`
-  ADD PRIMARY KEY (`atmID`),
   ADD KEY `BranchID` (`BranchID`);
 
 --
 -- Indexes for table `atmtransaction`
 --
 ALTER TABLE `atmtransaction`
-  ADD PRIMARY KEY (`TransactionID`),
+
   ADD KEY `atmID` (`atmID`);
 
 --
 -- Indexes for table `branch`
---
-ALTER TABLE `branch`
-  ADD PRIMARY KEY (`BranchID`);
+
 
 --
 -- Indexes for table `customer`
---
-ALTER TABLE `customer`
-  ADD PRIMARY KEY (`CustomerID`);
+
 
 --
 -- Indexes for table `customer_account`
@@ -557,28 +588,22 @@ ALTER TABLE `employee`
 --
 -- Indexes for table `fdplan`
 --
-ALTER TABLE `fdplan`
-  ADD PRIMARY KEY (`FDPlanID`);
+
 
 --
 -- Indexes for table `fixeddeposit`
 --
 ALTER TABLE `fixeddeposit`
-  ADD PRIMARY KEY (`FixedID`),
+
   ADD KEY `SavingNo` (`SavingNo`),
   ADD KEY `FDPlanID` (`FDPlanID`);
 
---
--- Indexes for table `lateloanreport`
---
-ALTER TABLE `lateloanreport`
-  ADD KEY `SettlementID` (`SettlementID`);
+
 
 --
 -- Indexes for table `loan`
 --
 ALTER TABLE `loan`
-  ADD PRIMARY KEY (`LoanID`),
   ADD KEY `AccountNo` (`AccountNo`);
 
 --
@@ -617,21 +642,10 @@ ALTER TABLE `onlineloan`
 --
 -- Indexes for table `onlinetransaction`
 --
-ALTER TABLE `onlinetransaction`
-  ADD PRIMARY KEY (`TransactionID`);
 
---
--- Indexes for table `savingaccount`
---
-ALTER TABLE `savingaccount`
-  ADD PRIMARY KEY (`AccountNo`),
-  ADD KEY `PlanID` (`PlanID`);
 
---
--- Indexes for table `savingplan`
---
-ALTER TABLE `savingplan`
-  ADD PRIMARY KEY (`PlanID`);
+
+
 
 --
 -- Indexes for table `transactionreport`
@@ -642,36 +656,28 @@ ALTER TABLE `transactionreport`
 --
 -- Indexes for table `transactions`
 --
-ALTER TABLE `transactions`
-  ADD PRIMARY KEY (`TransactionID`);
+
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table `account`
+-- AUTO_INCREMENT for table `fdplan`
 --
-ALTER TABLE `account`
-  MODIFY `AccountNo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `branch`
---
-ALTER TABLE `branch`
-  MODIFY `BranchID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `customer`
 --
+
 ALTER TABLE `customer`
-  MODIFY `CustomerID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `CustomerID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `loan`
 --
 ALTER TABLE `loan`
-  MODIFY `LoanID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `LoanID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `loanapplications`
@@ -685,11 +691,6 @@ ALTER TABLE `loanapplications`
 ALTER TABLE `loansettlement`
   MODIFY `SettlementID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
---
--- AUTO_INCREMENT for table `savingplan`
---
-ALTER TABLE `savingplan`
-  MODIFY `PlanID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
@@ -699,7 +700,7 @@ ALTER TABLE `savingplan`
 -- Constraints for table `account`
 --
 ALTER TABLE `account`
-  ADD CONSTRAINT `account_ibfk_1` FOREIGN KEY (`PlanID`) REFERENCES `savingplan` (`PlanID`),
+  ADD CONSTRAINT `account_ibfk_1` FOREIGN KEY (`PlanID`) REFERENCES `plan` (`PlanID`),
   ADD CONSTRAINT `account_ibfk_2` FOREIGN KEY (`BranchID`) REFERENCES `branch` (`BranchID`);
 
 --
@@ -725,14 +726,10 @@ ALTER TABLE `employee`
 -- Constraints for table `fixeddeposit`
 --
 ALTER TABLE `fixeddeposit`
-  ADD CONSTRAINT `fixeddeposit_ibfk_1` FOREIGN KEY (`SavingNo`) REFERENCES `savingaccount` (`AccountNo`),
+  ADD CONSTRAINT `fixeddeposit_ibfk_1` FOREIGN KEY (`SavingNo`) REFERENCES `account` (`AccountNo`),
   ADD CONSTRAINT `fixeddeposit_ibfk_2` FOREIGN KEY (`FDPlanID`) REFERENCES `fdplan` (`FDPlanID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
---
--- Constraints for table `lateloanreport`
---
-ALTER TABLE `lateloanreport`
-  ADD CONSTRAINT `lateloanreport_ibfk_1` FOREIGN KEY (`SettlementID`) REFERENCES `loansettlement` (`SettlementID`);
+
 
 --
 -- Constraints for table `loan`
@@ -771,14 +768,12 @@ ALTER TABLE `onlineloan`
 ALTER TABLE `onlinetransaction`
   ADD CONSTRAINT `onlinetransaction_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `transactions` (`TransactionID`);
 
---
--- Constraints for table `savingaccount`
---
-ALTER TABLE `savingaccount`
-  ADD CONSTRAINT `savingaccount_ibfk_1` FOREIGN KEY (`AccountNo`) REFERENCES `account` (`AccountNo`),
-  ADD CONSTRAINT `savingaccount_ibfk_2` FOREIGN KEY (`PlanID`) REFERENCES `savingplan` (`PlanID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+create view account_balance as
+select AccountNo,CustomerName,NIC,Balance
+from customer join customer_account using(CustomerID) join account using (AccountNo);

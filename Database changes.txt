@@ -9,7 +9,7 @@ Change loaninstallment MonthlyAmount float(10,2) DEFAULT 0
 Change loanapplications RepayYears to RepayMonths
 Add Account Created DateTime
 Remove loan Manual_Online
-Remove table loaninstallment and join with loan
+Remove table loaninstallment and  join with loan
 
 DELIMITER $$
         CREATE TRIGGER checkApproved 
