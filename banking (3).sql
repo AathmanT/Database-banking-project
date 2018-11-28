@@ -737,3 +737,7 @@ COMMIT;
 create view account_balance as
 select AccountNo,CustomerName,NIC,Balance
 from customer join customer_account using(CustomerID) join account using (AccountNo);
+
+create view lateloanReport as
+SELECT AccountNo,DateTime,DueDate from  loansettlement left join loan using(LoanID)
+left join account using(AccountNo);
