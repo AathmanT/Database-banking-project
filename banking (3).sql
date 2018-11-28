@@ -30,9 +30,9 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `account` (
   `AccountNo` int auto_increment PRIMARY  KEY ,
-  `Balance` double DEFAULT NULL,
+  `Balance` double DEFAULT 0,
   `BranchID` int,
-  `AccountType` enum('SavingAccount',' CurrentAccount') DEFAULT NULL,
+  `AccountType` enum('SavingAccount','CurrentAccount') DEFAULT NULL,
   `PlanID` int
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -80,7 +80,13 @@ CREATE TABLE `branch` (
 -- Dumping data for table `branch`
 --
 
-
+insert into `branch` (`BranchType`,`BranchName`,`BranchCity`) VALUES
+('Head Office','Jaffna','Jaffna'),
+('Area Branch','Nallur','Jaffna'),
+('Head Office','Mankulam','Vavuniya'),
+('Area Branch','Kaithadi','Jaffna'),
+('Head Branch','Kobai','Trinco'),
+('Area Branch','Kokuvil','Baticola');
 -- --------------------------------------------------------
 
 --
@@ -107,7 +113,8 @@ CREATE TABLE `customer_account` (
   `CustomerID` int NOT NULL,
   `AccountNo` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
--------------------------------------------
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `employee`
@@ -147,7 +154,7 @@ CREATE TABLE `fdplan` (
 
 CREATE TABLE `fixeddeposit` (
   `FixedID` varchar(30) NOT NULL,
-  `SavingNo` int DEFAULT NULL,
+  `SavingNo` int,
   `FDAmount` varchar(30) DEFAULT NULL,
   `InterestRate` double DEFAULT NULL,
   `OpeningDate` date DEFAULT NULL,
@@ -173,12 +180,14 @@ CREATE TABLE `lateloanreport` (
 --
 
 CREATE TABLE `loan` (
-  `LoanID` int(11) NOT NULL,
+  `LoanID` int auto_increment primary key,
   `InstallmentID` int(11) DEFAULT NULL,
   `AccountNo` int DEFAULT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
   `LoanAmount` float(30,2) DEFAULT NULL,
-  `InterestRate` float(10,2) DEFAULT NULL
+  `InterestRate` float(10,2) DEFAULT NULL,
+   `MonthlyAmount` float(10,2) DEFAULT 0,
+  `InstallmentRemaining` int DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -208,9 +217,9 @@ CREATE TABLE `loanapplications` (
 --
 DELIMITER $$
 CREATE TRIGGER `checkApproved` AFTER UPDATE ON `loanapplications` FOR EACH ROW BEGIN
-          if (NEW.Approved=1) THEN 
-             insert into loaninstallment (MonthlyAmount,InstallmentRemaining)
-             values ((new.amount+ new.amount*0.12*new.RepayYears*12)/(new.RepayYears*12),new.RepayYears*12);
+          if (NEW.Approved=1) THEN
+             insert into loan (AccountNo,LoanType,LoanAmount,InterestRate,MonthlyAmount,InstallmentRemaining)
+             values (new.AccountNo,new.LoanType,new.Amount,0.12,(new.amount+ new.amount*0.12*new.RepayYears*12)/(new.RepayYears*12),new.RepayYears*12);
           END IF;
         END
 $$
@@ -222,18 +231,12 @@ DELIMITER ;
 -- Table structure for table `loaninstallment`
 --
 
-CREATE TABLE `loaninstallment` (
-  `InstallmentID` int(11) NOT NULL,
-  `MonthlyAmount` float(10,2) DEFAULT 0,
-  `InstallmentRemaining` double DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `loaninstallment`
 --
 
-INSERT INTO `loaninstallment` (`InstallmentID`, `MonthlyAmount`, `InstallmentRemaining`) VALUES
-(2, 1477.7777777777778, 36);
+
 
 -- --------------------------------------------------------
 
@@ -243,7 +246,7 @@ INSERT INTO `loaninstallment` (`InstallmentID`, `MonthlyAmount`, `InstallmentRem
 
 CREATE TABLE `loansettlement` (
   `SettlementID` varchar(30) NOT NULL,
-  `InstallmentID` int(11) DEFAULT NULL,
+  `LoanID` int,
   `DateTime` date DEFAULT NULL,
   `DueDate` date NOT NULL,
   `PaidOnTime` tinyint(1) DEFAULT NULL
@@ -279,7 +282,7 @@ CREATE TABLE `manager` (
 --
 
 CREATE TABLE `onlineloan` (
-  `LoanID` int(11) NOT NULL,
+  `LoanID` int ,
   `FixedID` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -333,6 +336,16 @@ CREATE TABLE `savingplan` (
   `MinimumAmount` int(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `savingplan`
+--
+
+insert into `savingplan` (`Category`,`InterestRate`,`MinimumAmount`) VALUES
+('Children',12,0),
+('Teen',11,500),
+('Adult(18+)',10,1000),
+('Senior(60+)',13,1000),
+('NoInterest',0,5000);
 -- --------------------------------------------------------
 
 --
@@ -381,7 +394,9 @@ INSERT INTO `transactions` (`TransactionID`, `Amount`, `Date_Time`, `Type`) VALU
 -- Indexes for table `account`
 --
 ALTER TABLE `account`
-  ADD KEY `BranchID` (`BranchID`);
+  ADD KEY `BranchID` (`BranchID`),
+  ADD KEY `PlanID` (`PlanID`);
+
 --
 -- Indexes for table `atm`
 --
@@ -441,9 +456,8 @@ ALTER TABLE `lateloanreport`
 -- Indexes for table `loan`
 --
 ALTER TABLE `loan`
-  ADD PRIMARY KEY (`LoanID`),
-  ADD KEY `AccountNo` (`AccountNo`),
-  ADD KEY `InstallmentID` (`InstallmentID`);
+  ADD KEY `AccountNo` (`AccountNo`);
+
 
 --
 -- Indexes for table `loanapplications`
@@ -456,15 +470,14 @@ ALTER TABLE `loanapplications`
 --
 -- Indexes for table `loaninstallment`
 --
-ALTER TABLE `loaninstallment`
-  ADD PRIMARY KEY (`InstallmentID`);
+
 
 --
 -- Indexes for table `loansettlement`
 --
 ALTER TABLE `loansettlement`
   ADD PRIMARY KEY (`SettlementID`),
-  ADD KEY `InstallmentID` (`InstallmentID`);
+  ADD KEY `LoanID` (`LoanID`);
 
 --
 -- Indexes for table `login`
@@ -518,10 +531,7 @@ ALTER TABLE `transactions`
 --
 
 --
--- AUTO_INCREMENT for table `loan`
---
-ALTER TABLE `loan`
-  MODIFY `LoanID` int(11) NOT NULL AUTO_INCREMENT;
+
 
 --
 -- AUTO_INCREMENT for table `loanapplications`
@@ -530,10 +540,7 @@ ALTER TABLE `loanapplications`
   MODIFY `ApplicationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT for table `loaninstallment`
---
-ALTER TABLE `loaninstallment`
-  MODIFY `InstallmentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
 
 --
 -- Constraints for dumped tables
@@ -543,7 +550,8 @@ ALTER TABLE `loaninstallment`
 -- Constraints for table `account`
 --
 ALTER TABLE `account`
-  ADD CONSTRAINT `account_ibfk_1` FOREIGN KEY (`BranchID`) REFERENCES `branch` (`BranchID`);
+  ADD CONSTRAINT `account_ibfk_1` FOREIGN KEY (`PlanID`) REFERENCES `savingplan` (`PlanID`),
+  ADD CONSTRAINT `account_ibfk_2` FOREIGN KEY (`BranchID`) REFERENCES `branch` (`BranchID`);
 
 --
 -- Constraints for table `atm`
@@ -581,8 +589,8 @@ ALTER TABLE `lateloanreport`
 -- Constraints for table `loan`
 --
 ALTER TABLE `loan`
-  ADD CONSTRAINT `loan_ibfk_1` FOREIGN KEY (`AccountNo`) REFERENCES `account` (`AccountNo`),
-  ADD CONSTRAINT `loan_ibfk_2` FOREIGN KEY (`InstallmentID`) REFERENCES `loaninstallment` (`InstallmentID`);
+  ADD CONSTRAINT `loan_ibfk_1` FOREIGN KEY (`AccountNo`) REFERENCES `account` (`AccountNo`);
+
 
 --
 -- Constraints for table `loanapplications`
@@ -595,7 +603,7 @@ ALTER TABLE `loanapplications`
 -- Constraints for table `loansettlement`
 --
 ALTER TABLE `loansettlement`
-  ADD CONSTRAINT `loansettlement_ibfk_1` FOREIGN KEY (`InstallmentID`) REFERENCES `loaninstallment` (`InstallmentID`);
+  ADD CONSTRAINT `loansettlement_ibfk_1` FOREIGN KEY (`LoanID`) REFERENCES `loan` (`LoanID`);
 
 --
 -- Constraints for table `manager`
@@ -615,6 +623,8 @@ ALTER TABLE `onlineloan`
 ALTER TABLE `onlinetransaction`
   ADD CONSTRAINT `onlinetransaction_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `transactions` (`TransactionID`);
 
+
+
 --
 -- Constraints for table `savingaccount`
 --
@@ -626,3 +636,9 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+create view account_balance as
+select AccountNo,CustomerName,NIC,Balance
+from customer join customer_account using(CustomerID) join account using (AccountNo);
+
+
