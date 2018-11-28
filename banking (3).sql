@@ -87,7 +87,7 @@ INSERT INTO `account` (`AccountNo`, `Balance`, `BranchID`, `AccountType`, `PlanI
 
 CREATE TABLE `atm` (
                      `atmID` int auto_increment PRIMARY key,
-                     `BranchID` varchar(30) DEFAULT NULL
+                     `BranchID` int not NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -459,8 +459,7 @@ if ((SELECT COUNT(account.AccountNo) FROM account
 SIGNAL SQLSTATE '45000'
 SET MESSAGE_TEXT = 'wrong account numbers';
 END IF;
-END
-$$
+END $$
 DELIMITER ;
 
 
