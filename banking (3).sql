@@ -159,7 +159,7 @@ CREATE TABLE `customer_account` (
 --
 
 CREATE TABLE `employee` (
-  `EmployeeID` varchar(30) NOT NULL,
+  `EmployeeID` int auto_increment primary key,
   `BranchID` int(11) DEFAULT NULL,
   `EmpName` varchar(30) DEFAULT NULL,
   `EmpAddress` varchar(30) DEFAULT NULL,
@@ -171,9 +171,9 @@ CREATE TABLE `employee` (
 -- Dumping data for table `employee`
 --
 
-INSERT INTO `employee` (`EmployeeID`, `BranchID`, `EmpName`, `EmpAddress`, `EmpEmail`, `EmpPhoneNo`) VALUES
-('', 1, 'Stark', 'Malibu', 'Stark', 1221212),
-('2', 2, 'Tony', 'Malibu', 'tony', 1221212);
+INSERT INTO `employee` ( `BranchID`, `EmpName`, `EmpAddress`, `EmpEmail`, `EmpPhoneNo`) VALUES
+( 1, 'Stark', 'Malibu', 'Stark', 1221212),
+( 2, 'Tony', 'Malibu', 'tony', 1221212);
 
 -- --------------------------------------------------------
 
@@ -290,7 +290,7 @@ CREATE TABLE `loanapplications` (
   `ApplicationID` int(11) NOT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
   `AccountNo` int(11) DEFAULT NULL,
-  `EmployeeID` varchar(30) DEFAULT NULL,
+  `EmployeeID` int not NULL,
   `RepayYears` int(4) DEFAULT NULL,
   `Amount` float(30,2) DEFAULT NULL,
   `Approved` tinyint(1) DEFAULT '0'
@@ -301,7 +301,7 @@ CREATE TABLE `loanapplications` (
 --
 
 INSERT INTO `loanapplications` (`ApplicationID`, `LoanType`, `AccountNo`, `EmployeeID`, `RepayYears`, `Amount`, `Approved`) VALUES
-(15, 'Personal Loan', 1, '', 3, 10000.00, 1);
+(15, 'Personal Loan', 1, 1, 3, 10000.00, 1);
 
 --
 -- Triggers `loanapplications`
@@ -380,7 +380,7 @@ CREATE TABLE `login` (
 --
 
 CREATE TABLE `manager` (
-  `EmployeeID` varchar(30) NOT NULL
+  `EmployeeID` int
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -551,7 +551,6 @@ ALTER TABLE `customer_account`
 -- Indexes for table `employee`
 --
 ALTER TABLE `employee`
-  ADD PRIMARY KEY (`EmployeeID`),
   ADD KEY `BranchID` (`BranchID`);
 
 --
