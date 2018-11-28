@@ -75,7 +75,7 @@ if(!empty($_POST)) {
 </style>
 <body>
 
-<h3>Online Transaction </h3>
+<h3>Manual Loan </h3>
 
 <div>
     <form action="" method="post">
