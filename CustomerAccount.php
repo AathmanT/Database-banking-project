@@ -114,25 +114,54 @@ if(!empty($_POST)) {
     $CustomerPhoneNo=$_POST['customerphoneno'];
     $BranchName=$_POST['branchname'];
 
+    //insert into customer table
+    $stmt = $db->prepare("insert into customer (CustomerName,CustomerAddress,DateOfBirth,NIC,CustomerEmail,CustomerPhoneNo) 
+    values (?,?,?,?,?,?)");
+    $stmt->bind_param('sssssi',$_POST['customername'], $_POST['customeraddress'],$_POST['dateofbirth'],$_POST['NIC'],$_POST['customeremail'],$_POST['customerphoneno']);
+    $stmt->execute();
+
+    //insert into account table
+    $bid=$db->prepare("select branchID from branch where branchName=?");
+    $bid->bind_param('s',$_POST['branchname']);
+    $bid->execute();
+    $result = $bid->get_result();
+    $var1 = $result->fetch_object()->branchID;
+
+    $pid=$db->prepare("select planID from savingplan where category=?");
+    $pid->bind_param('s',$_POST['category']);
+    $pid->execute();
+    $result1 = $pid->get_result();
+    $var2 = $result1->fetch_object()->planID;
+
+    $stm = $db->prepare("insert into account (BranchID,AccountType,PlanID) values
+ (?,?,?)");
+   $stm->bind_param('isi',$var1,$_POST['accounttype'],$var2);
+    $stm->execute();
+
+    //insert into customer_account table
+    $ca=$db->prepare("insert into customer_account (CustomerID,AccountNo) values (?,?)");
+    $v1=$db->query("select max(CustomerID) as cid from customer");
+    $r1 = $v1->fetch_object()->cid;
+
+    $v2=$db->query("select max(AccountNo) as aid from account");
+    $r2=$v2->fetch_object()->aid;
+
+    $ca->bind_param('ii',$r1,$r2);
+    $ca->execute();
+    //var_dump($r1);
+    //var_dump($r2);
+    //var_dump($var1);
+    //var_dump($var2);
+    /*
     $db->query("insert into customer (CustomerName,CustomerAddress,DateOfBirth,NIC,CustomerEmail,CustomerPhoneNo) values
  ('{$_POST['customername']}','{$_POST['customeraddress']}','{$_POST['dateofbirth']}','{$_POST['NIC']}','{$_POST['customeremail']}',
  '{$_POST['customerphoneno']}')");
-
     $db->query("insert into account (BranchID,AccountType,PlanID) values
  ((select branchID from branch where branchName='{$_POST['branchname']}'),'{$_POST['accounttype']}',(select PlanID from savingplan where category='{$_POST['category']}'))");
-
     $db->query("insert into customer_account (CustomerID,AccountNo) values (last_insert_id(),last_insert_id())");
-    //$db->query("insert into customer_account (CustomerID,AccountNo) values ((select max(CustomerID) from customer),(select max(AccountNo) from account))");
-
-    //INSERT INTO customer_account(CustomerID,AccountNo) VALUES ( (SELECT MAX(CustomerID) FROM Customer),(SELECT MAX(AccountNo) FROM account));
-    //$db->query("update account  set PlanID =(select PlanID from savingplan where category='{$_POST['category']}')");
-    //$db->query("insert into account()")
-
-    //$db->query("insert into ")
+    $db->query("insert into customer_account (CustomerID,AccountNo) values ((select max(CustomerID) from customer),(select max(AccountNo) from account))");
 
     //  var_dump($db->query("select last_insert_id() from account")->fetch_object());
-
+    */
 }
-//insert into account (AccountNo,BranchID,AccountType) values
-//  ('160001',(select branchID from branch where branchName='Jaffna'),'SavingAccount')
 ?>
