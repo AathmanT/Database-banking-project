@@ -312,7 +312,7 @@ DELIMITER ;
 
 CREATE TABLE `loanapplications` (
   `ApplicationID` int(11) NOT NULL,
-  `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
+  `LoanType` enum('PersonalLoan','BusinessLoan') DEFAULT NULL,
   `AccountNo` int,
   `EmployeeID` varchar(30) DEFAULT NULL,
   `RepayYears` int(4) DEFAULT NULL,
