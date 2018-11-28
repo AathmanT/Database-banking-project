@@ -123,7 +123,7 @@ if(!empty($_POST)) {
     $result = $bid->get_result();
     $var1 = $result->fetch_object()->branchID;
 
-    $pid=$db->prepare("select planID from savingplan where category=?");
+    $pid=$db->prepare("select planID from plan where category=?");
     $pid->bind_param('s',$_POST['category']);
     $pid->execute();
     $result1 = $pid->get_result();
