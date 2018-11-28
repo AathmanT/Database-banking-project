@@ -51,13 +51,11 @@
     <form action="" method="post">
         <label for="accounttype">AccountType</label>
         <select type="text" id="accounttype" required name="accounttype">
-            <option>AccountType..</option>
             <option>CurrentAccount</option>
         </select>
 
         <label for="category">Category</label>
         <select type="text" id="category" required name="category">
-            <option>Category..</option>
             <option>NoInterest</option>
         </select>
 
@@ -119,11 +117,8 @@ if(!empty($_POST)) {
     $db->query("insert into account (BranchID,AccountType,PlanID) values
  ((select branchID from branch where branchName='{$_POST['branchname']}'),'{$_POST['accounttype']}',(select PlanID from savingplan where category='{$_POST['category']}'))");
 
-    //$db->query("insert into account()")
 
-    //$db->query("insert into ")
-
-    //  var_dump($db->query("select last_insert_id() from account")->fetch_object());
+    $db->query("insert into customer_account (CustomerID,AccountNo) values ((select max(CustomerID) from customer),(select max(AccountNo) from account))");
 
 }
 //insert into account (AccountNo,BranchID,AccountType) values

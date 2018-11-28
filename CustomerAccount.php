@@ -51,13 +51,11 @@
     <form action="" method="post">
         <label for="accounttype">AccountType</label>
         <select type="text" id="accounttype" required name="accounttype">
-            <option>AccountType..</option>
             <option>SavingAccount</option>
         </select>
 
         <label for="category">Category</label>
         <select type="text" id="category" required name="category">
-            <option>Category..</option>
             <option>Children</option>
             <option>Teen</option>
             <option>Adult(18+)</option>
@@ -86,6 +84,7 @@
         <select type="text" id="branchname" required name="branchname">
             <option>BranchName..</option>
             <option>Jaffna</option>
+            <option>Kaithadi</option>
             <option>Nallur</option>
             <option>Mankulam</option>
             <option>Kaithadi</option>
@@ -122,7 +121,9 @@ if(!empty($_POST)) {
     $db->query("insert into account (BranchID,AccountType,PlanID) values
  ((select branchID from branch where branchName='{$_POST['branchname']}'),'{$_POST['accounttype']}',(select PlanID from savingplan where category='{$_POST['category']}'))");
 
+    $db->query("insert into customer_account (CustomerID,AccountNo) values ((select max(CustomerID) from customer),(select max(AccountNo) from account))");
 
+    //INSERT INTO customer_account(CustomerID,AccountNo) VALUES ( (SELECT MAX(CustomerID) FROM Customer),(SELECT MAX(AccountNo) FROM account));
     //$db->query("update account  set PlanID =(select PlanID from savingplan where category='{$_POST['category']}')");
     //$db->query("insert into account()")
 
