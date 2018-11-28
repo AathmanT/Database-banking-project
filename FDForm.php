@@ -63,8 +63,8 @@
         <label for="period">Period</label>
         <select type="text" id="period" required name="period">
             <option>6 Months </option>
-            <option>1 Year</option>
-            <option>3 Year</option>
+            <option>12 Months</option>
+            <option>36 Months</option>
         </select>
 
 
@@ -77,9 +77,38 @@
 
 <?php
 
-$db=new mysqli('localhost','root','','banking');
+$db=new mysqli('localhost','root','','bank3');
 
 if(!empty($_POST)) {
+
+    /*$AccountType = $_POST['accounttype'];
+    $Category=$_POST['category'];
+    $CustomerName = $_POST['customername'];
+    $CustomerAddress = $_POST['customeraddress'];
+    $DateOfBirth = $_POST['dateofbirth'];
+    $NIC=$_POST['NIC'];
+    $CustomerEmail=$_POST['customeremail'];
+    $CustomerPhoneNo=$_POST['customerphoneno'];
+    $BranchName=$_POST['branchname'];*/
+
+    $db->query("insert into fixeddeposit (SavingNo,FDAmount,OpeningDate,FDPlanID) values
+ ('{$_POST['savingaccountno']}','{$_POST['amount']}','{$_POST['openingdate']}',(select FDPlanID from fdplan where Period='{$_POST['period']}'))");
+/*
+    $db->query("insert into account (BranchID,AccountType) values
+ ((select branchID from branch where branchName='{$_POST['branchname']}'),'{$_POST['accounttype']}')");
+
+    $db->query("update account  set PlanID =(select PlanID from savingplan where category='{$_POST['category']}')");
+    //$db->query("insert into account()")*/
+
+    //$db->query("insert into ")
+
+    //  var_dump($db->query("select last_insert_id() from account")->fetch_object());
+
+}
+//insert into account (AccountNo,BranchID,AccountType) values
+//  ('160001',(select branchID from branch where branchName='Jaffna'),'SavingAccount')
+
+/*if(!empty($_POST)) {
 
     $AccountType = $_POST['accounttype'];
     $CustomerName = $_POST['customername'];
@@ -101,7 +130,7 @@ if(!empty($_POST)) {
 
     //  var_dump($db->query("select last_insert_id() from account")->fetch_object());
 
-}
+}*/
 //insert into account (AccountNo,BranchID,AccountType) values
 //  ('160001',(select branchID from branch where branchName='Jaffna'),'SavingAccount')
 ?>
