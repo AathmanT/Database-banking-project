@@ -267,7 +267,7 @@ CREATE TABLE `loanapplications` (
   `ApplicationID` int(11) NOT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
   `AccountNo` int,
-  `EmployeeID` varchar(30) not NULL,
+  `EmployeeID` varchar(30) DEFAULT NULL,
   `RepayYears` int(4) DEFAULT NULL,
   `Amount` float(30,2) DEFAULT NULL,
   `Approved` tinyint(1) DEFAULT '0'
