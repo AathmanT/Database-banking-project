@@ -62,22 +62,22 @@
 
 <div>
     <form action="" method="post">
-        <label for="Account no">Account no</label>
-        <input type="text" id="Account no" name="Account no" placeholder="Account no..">
+        <label for="AccountNo">AccountNo</label>
+        <input type="text" id="AccountNo" name="AccountNo" placeholder="AccountNo..">
 
 
-        <label for="Loan type">Loan type</label>
-        <select id="Loan type" name="Loan type">
-            <option value="volvo">Business</option>
-            <option value="saab">Personal</option>
+        <label for="LoanType">LoanType</label>
+        <select id="LoanType" name="LoanType">
+            <option value="Business">Business</option>
+            <option value="Personal">Personal</option>
         </select>
 
         <label for="Amount">Amount</label>
         <input type="number" id="Amount" name="Amount" placeholder="Amount..">
 
 
-        <label for="RepayYears">RepayYears</label>
-        <input type="number"  id="RepayYears" name="RepayYears" required placeholder="RepayYears.." min="0">
+        <label for="RepayMonths">RepayMonths</label>
+        <input type="number"  id="RepayMonths" name="RepayMonths" required placeholder="RepayMonths.." min="0">
 
 
 
@@ -91,11 +91,11 @@ $db=new mysqli('localhost','root','','banking');
 
 if(!empty($_POST)) {
 
-    $sender = $_POST['sender'];
-    $reciever = $_POST['reciever'];
-    $amount = $_POST['amount'];
-    $TransactionID = $_POST['TransactionID'];
 
-    $db->query("insert into transactions (TransactionID,Amount,Date_Time,Type) values
- ('{$_POST['TransactionID']}','{$_POST['amount']}',NOW(),'Online')");
+
+    $db->query("insert into loan (AccountNo,LoanType,LoanAmount,InterestRate,InstallmentRemaining) values
+ ('{$_POST['AccountNo']}','{$_POST['LoanType']}','{$_POST['Amount']}',0.12,'{$_POST['RepayMonths']}')");
+
+    //insert into loan (AccountNo,LoanType,LoanAmount,InterestRate,InstallmentRemaining) values
+    //(1,'Business',10000,0.12,24)
 }

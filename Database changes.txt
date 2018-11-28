@@ -23,6 +23,89 @@ DELIMITER $$
           END IF;
         END $$
   DELIMITER ;
+
+  DELIMITER $$
+          CREATE TRIGGER checkPaidOnTime
+          before insert
+          ON loansettlement
+          FOR EACH ROW
+          BEGIN
+            set new.PaidOntime=checkPaidOnTime(new.DateTime,new.DueDate);
+
+          END $$
+    DELIMITER ;
+
+    delimiter $$
+    create function checkPaidOnTime(PaidDate Date,DueDate Date)
+    returns int
+    begin
+         declare result int;
+        if (PaidDate<DueDate) then
+            set result=1;
+        else set result=0;
+        end if;
+         return result;
+    end $$
+    delimiter ;
+
+    DELIMITER $$
+              CREATE TRIGGER reduceInstallment
+              after insert
+              ON loansettlement
+              FOR EACH ROW
+              BEGIN
+                update loan set InstallmentRemaining=InstallmentRemaining-1 where LoanID=new.LoanID;
+
+              END $$
+        DELIMITER ;
+
+
+    delimiter $$
+        create function checkFDEnough(fdAmount float,loanAmount float)
+        returns int
+        begin
+             declare result int;
+            if (loanAmount<=(fdAmount*0.6) and loanAmount<=500000) then
+                set result=1;
+            else set result=0;
+            end if;
+             return result;
+        end $$
+        delimiter ;
+
+
+     DELIMITER $$
+           CREATE TRIGGER checkFDExists
+           before insert
+           ON loan
+           FOR EACH ROW
+           BEGIN
+             if(select count(SavingNo) from fixeddeposit where SavingNo=new.AccountNo)<1 THEN
+              SIGNAL SQLSTATE '45000'
+              SET MESSAGE_TEXT = 'Fixed Deposit not found';
+
+            elseif checkFDEnough((select FDAmount from fixeddeposit where SavingNo=new.AccountNo),new.LoanAmount)=0 THEN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'Fixed Deposit not enough';
+            else set new.MonthlyAmount=((new.LoanAmount+ new.LoanAmount*0.12*new.InstallmentRemaining)/(new.InstallmentRemaining));
+             end if;
+           END $$
+     DELIMITER ;
+
+     DELIMITER $$
+                     CREATE TRIGGER depositLoan
+                     after insert
+                     ON loan
+                     FOR EACH ROW
+                     BEGIN
+
+                       update account set Balance=Balance+new.LoanAmount where AccountNo=new.AccountNo;
+                       insert into transactions (Amount,Date_Time,Type) values (new.LoanAmount,NOW(),'LoanDeposit');
+
+                 END $$
+               DELIMITER ;
+
+
  ======================================================
 
  Thineshan
