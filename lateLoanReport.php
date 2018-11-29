@@ -65,7 +65,7 @@ div {
 $db=new mysqli('localhost','root','','banking');
 
 if(!empty($_POST)){
-	
+
 
 //$db->multi_query("start transaction;insert into transactions (TransactionID,Amount,Date_Time,Type) values
 // ('{$_POST['TransactionID']}','{$_POST['amount']}',NOW(),'Online');commit;");
@@ -80,10 +80,13 @@ if(!empty($_POST)){
 
 
 //if($results=$db->query("SELECT AccountNo,DateTime,DueDate from  loansettlement left join loan using(LoanID) left join account using(AccountNo) where BranchID=2 and PaidOnTime=0 and DueDate between '2018-10-01' and '2018-12-01'")){
-    if($results=$db->query("SELECT AccountNo,DateTime,DueDate from  loansettlement left join loan using(LoanID) left join account using(AccountNo) where BranchID=2 and PaidOnTime=0 and DueDate between '{$_POST['StartDate']}' and '{$_POST['EndDate']}'")){
-	if($results->num_rows){
+   // if($results=$db->query("SELECT AccountNo,DateTime,DueDate from  loansettlement left join loan using(LoanID) left join account using(AccountNo) where BranchID=2 and PaidOnTime=0 and DueDate between '{$_POST['StartDate']}' and '{$_POST['EndDate']}'")){
+    if($results=$db->query("SELECT AccountNo,DateTime,DueDate from  lateloanreport where BranchID=2 and PaidOnTime=0 and DueDate between '{$_POST['StartDate']}' and '{$_POST['EndDate']}'")){
+    if($results->num_rows){
+        var_dump($results);
 		while($row=$results->fetch_object()){
 			$records[]=$row;
+
 		}
 		$results->free();
 	}

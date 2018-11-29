@@ -24,6 +24,29 @@ SET time_zone = "+00:00";
 
 DELIMITER $$
 --
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ProcedureDepositLoan` (IN `SP_loanAmount` FLOAT(30,2), IN `SP_AccountNo` INT)  BEGIN
+
+    DECLARE errno INT;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+    GET CURRENT DIAGNOSTICS CONDITION 1 errno = MYSQL_ERRNO;
+    SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'You cant do this transaction';
+    ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+     update account set Balance=Balance+SP_loanAmount where AccountNo=SP_AccountNo;
+     insert into transactions (Amount,Date_Time,Type) values (SP_loanAmount,NOW(),'LoanDeposit');
+
+    COMMIT WORK;
+
+END$$
+
+--
 -- Functions
 --
 CREATE DEFINER=`root`@`localhost` FUNCTION `checkFDEnough` (`fdAmount` FLOAT, `loanAmount` FLOAT) RETURNS INT(11) begin
@@ -61,7 +84,7 @@ CREATE TABLE `account` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 DELIMITER $$
-CREATE TRIGGER `checkBalance` BEFORE update ON `account` FOR EACH ROW BEGIN
+CREATE TRIGGER `checkBalance` BEFORE UPDATE ON `account` FOR EACH ROW BEGIN
 if (NEW.Balance < 0 ) THEN
 SIGNAL SQLSTATE '45000'
 SET MESSAGE_TEXT = 'No Balance';
@@ -71,7 +94,8 @@ $$
 DELIMITER ;
 
 --
--- Dumping data for table `account`
+-- Stand-in structure for view `account_balance`
+-- (See below for the actual view)
 --
 
 INSERT INTO `account` (`AccountNo`, `Balance`, `BranchID`, `AccountType`, `PlanID`) VALUES
@@ -97,13 +121,13 @@ CREATE TABLE `atm` (
 --
 
 CREATE TABLE `atmtransaction` (
-                                `TransactionID` int PRIMARY key,
-                                `AccountNo` varchar(30) DEFAULT NULL,
-                                `atmID` int  not null
+  `TransactionID` int(11) NOT NULL,
+  `AccountNo` int not NULL,
+  `atmID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 DELIMITER $$
-CREATE TRIGGER `checkAccountNo` BEFORE insert ON `atmtransaction` FOR EACH ROW BEGIN
+CREATE TRIGGER `checkAccountNo` BEFORE INSERT ON `atmtransaction` FOR EACH ROW BEGIN
             if ((SELECT COUNT(account.AccountNo) FROM account
             WHERE account.AccountNo =NEW.AccountNo) = 0  ) THEN
    SIGNAL SQLSTATE '45000'
@@ -112,6 +136,7 @@ END IF;
 END
 $$
 DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -179,7 +204,7 @@ CREATE TABLE `customer_account` (
 
 CREATE TABLE `employee` (
   `EmployeeID` varchar(30) NOT NULL,
-  `BranchID` int,
+  `BranchID` int not null,
   `EmpName` varchar(30) DEFAULT NULL,
   `EmpAddress` varchar(30) DEFAULT NULL,
   `EmpEmail` varchar(30) DEFAULT NULL,
@@ -259,14 +284,13 @@ DELIMITER ;
 --
 
 CREATE TABLE `loan` (
-  `LoanID` int auto_increment primary key,
-  `InstallmentID` int(11) not NULL,
-  `AccountNo` int not NULL,
-  `LoanType` enum('PersonalLoan','BusinessLoan') DEFAULT NULL,
+  `LoanID` int(11) NOT NULL,
+  `AccountNo` int(11) NOT NULL,
+  `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
   `LoanAmount` float(30,2) DEFAULT NULL,
   `InterestRate` float(10,2) DEFAULT NULL,
-   `MonthlyAmount` float(10,2) DEFAULT 0,
-  `InstallmentRemaining` int DEFAULT 0
+  `MonthlyAmount` float(10,2) DEFAULT '0.00',
+  `InstallmentRemaining` int(11) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -297,10 +321,10 @@ DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `depositLoan` AFTER INSERT ON `loan` FOR EACH ROW BEGIN
 
-                       update account set Balance=Balance+new.LoanAmount where AccountNo=new.AccountNo;
-                       insert into transactions (Amount,Date_Time,Type) values (new.LoanAmount,NOW(),'LoanDeposit');
+               update account set Balance=Balance+new.LoanAmount where AccountNo=new.AccountNo;
+               insert into transactions (Amount,Date_Time,Type) values (new.LoanAmount,NOW(),'LoanDeposit');
 
-                     END
+         END
 $$
 DELIMITER ;
 
@@ -319,12 +343,6 @@ CREATE TABLE `loanapplications` (
   `Amount` float(30,2) DEFAULT NULL,
   `Approved` tinyint(1) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `loanapplications`
---
-
-
 
 --
 -- Triggers `loanapplications`
@@ -424,11 +442,14 @@ CREATE TABLE `onlineloan` (
 --
 
 CREATE TABLE `onlinetransaction` (
-                                   `TransactionID` int  PRIMARY key,
-                                   `SenderAccNo` varchar(30) DEFAULT NULL,
-                                   `RecieverAccNo` varchar(30) DEFAULT NULL
+  `TransactionID` int(11) NOT NULL,
+  `SenderAccNo` varchar(30) DEFAULT NULL,
+  `RecieverAccNo` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
--- Dumping data for table `onlinetransaction`
+
+--
+-- Triggers `onlinetransaction`
+--
 DELIMITER $$
 CREATE TRIGGER `checkAccountNos` BEFORE insert ON `onlinetransaction` FOR EACH ROW BEGIN
 if ((SELECT COUNT(account.AccountNo) FROM account
@@ -501,6 +522,18 @@ CREATE TABLE `transactions` (
 
 
 
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `account_balance`  AS  select `customer_account`.`AccountNo` AS `AccountNo`,`customer`.`CustomerName` AS `CustomerName`,`customer`.`NIC` AS `NIC`,`account`.`Balance` AS `Balance` from ((`customer` join `customer_account` on((`customer`.`CustomerID` = `customer_account`.`CustomerID`))) join `account` on((`customer_account`.`AccountNo` = `account`.`AccountNo`))) ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `lateloanreport`
+--
+DROP TABLE IF EXISTS `lateloanreport`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `lateloanreport`  AS  select `loan`.`AccountNo` AS `AccountNo`,`loansettlement`.`DateTime` AS `DateTime`,`loansettlement`.`DueDate` AS `DueDate`,`account`.`BranchID` AS `BranchID`,`loansettlement`.`PaidOnTime` AS `PaidOnTime` from ((`loansettlement` left join `loan` on((`loansettlement`.`LoanID` = `loan`.`LoanID`))) left join `account` on((`loan`.`AccountNo` = `account`.`AccountNo`))) ;
+
+--
 -- Indexes for dumped tables
 --
 
