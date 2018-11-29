@@ -202,8 +202,8 @@ INSERT INTO `employee` (`EmployeeID`, `BranchID`, `EmpName`, `EmpAddress`, `EmpE
 
 CREATE TABLE `fdplan` (
                         `FDPlanID` int auto_increment PRIMARY key,
-                        `InterestRate` float (2,2) not null ,
-                        `Period` int(11) not NULL
+                        `InterestRate` float (10,2) not null ,
+                        `Period` int not NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
