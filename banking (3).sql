@@ -262,7 +262,7 @@ CREATE TABLE `loan` (
   `LoanID` int auto_increment primary key,
   `InstallmentID` int(11) not NULL,
   `AccountNo` int not NULL,
-  `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
+  `LoanType` enum('PersonalLoan','BusinessLoan') DEFAULT NULL,
   `LoanAmount` float(30,2) DEFAULT NULL,
   `InterestRate` float(10,2) DEFAULT NULL,
    `MonthlyAmount` float(10,2) DEFAULT 0,
@@ -274,8 +274,8 @@ CREATE TABLE `loan` (
 --
 
 INSERT INTO `loan` (`LoanID`, `AccountNo`, `LoanType`, `LoanAmount`, `InterestRate`, `MonthlyAmount`, `InstallmentRemaining`) VALUES
-(1, 1, 'Personal Loan', 10000.00, 0.12, 1477.78, 35),
-(2, 1, '', 120000.00, 0.12, 0.00, 24);
+(1, 1, 'PersonalLoan', 10000.00, 0.12, 1477.78, 35),
+(2, 1, 'BusinessLoan', 120000.00, 0.12, 0.00, 24);
 
 --
 -- Triggers `loan`

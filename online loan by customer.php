@@ -68,8 +68,8 @@
 
         <label for="LoanType">LoanType</label>
         <select id="LoanType" name="LoanType">
-            <option value="Business">Business</option>
-            <option value="Personal">Personal</option>
+            <option value="BusinessLoan">BusinessLoan</option>
+            <option value="PersonalLoan">PersonalLoan</option>
         </select>
 
         <label for="Amount">Amount</label>
@@ -93,8 +93,12 @@ if(!empty($_POST)) {
 
 
 
-    $db->query("insert into loan (AccountNo,LoanType,LoanAmount,InterestRate,InstallmentRemaining) values
- ('{$_POST['AccountNo']}','{$_POST['LoanType']}','{$_POST['Amount']}',0.12,'{$_POST['RepayMonths']}')");
+    //$db->query("insert into loan (AccountNo,LoanType,LoanAmount,InterestRate,InstallmentRemaining) values
+    //('{$_POST['AccountNo']}','{$_POST['LoanType']}','{$_POST['Amount']}',0.12,'{$_POST['RepayMonths']}')");
+    $stmt = $db->prepare("insert into loan (AccountNo,LoanType,LoanAmount,InterestRate,InstallmentRemaining) values
+ (?,?,?,?,?)");
+    $stmt->bind_param('isddi',$_POST['AccountNo'], $_POST['LoanType'],$_POST['Amount'],0.12,$_POST['RepayMonths']);
+    $stmt->execute();
 
     //insert into loan (AccountNo,LoanType,LoanAmount,InterestRate,InstallmentRemaining) values
     //(1,'Business',10000,0.12,24)
