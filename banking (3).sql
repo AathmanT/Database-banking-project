@@ -257,7 +257,7 @@ UPDATE account set account.Balance= (account.Balance+
     (select InterestRate from fdplan where fdplan.FDPlanID=
   (SELECT FDPlanID FROM fixeddeposit WHERE fixeddeposit.SavingNo=account.AccountNo)) )/(100*12))
   WHERE (account.AccountNo=(SELECT SavingNo FROM fixeddeposit WHERE SavingNo = account.AccountNo)
-  and ((CURDATE() >(select OpeningDate from fixeddeposit WHERE SavingNo = account.AccountNo) ) ));
+  and ((CURDATE() -(select OpeningDate from fixeddeposit WHERE SavingNo = account.AccountNo) )=30 ));
 /*UPDATE fixeddeposit set fixeddeposit.UpdatedDate = ((select OpeningDate from fixeddeposit));
 UPDATE fixeddeposit set fixeddeposit.UpdatedDate = (2018-11-12);
 */
@@ -269,7 +269,8 @@ UPDATE fixeddeposit set fixeddeposit.UpdatedDate = (2018-11-12);
 DELIMITER $$
 CREATE TRIGGER `checkAccountNoFD` BEFORE INSERT ON `fixeddeposit` FOR EACH ROW BEGIN
 if ( (SELECT COUNT(account.AccountNo) FROM account
-WHERE account.AccountNo =NEW.SavingNo) =0) THEN
+WHERE account.AccountNo =NEW.SavingNo) =0 or (SELECT AccountType FROM account
+WHERE account.AccountNo =NEW.SavingNo) != 'SavingAccount') THEN
 
 SIGNAL SQLSTATE '45000'
 SET MESSAGE_TEXT = 'saving account no not found ';
@@ -284,7 +285,7 @@ DELIMITER ;
 --
 
 CREATE TABLE `loan` (
-  `LoanID` int(11) NOT NULL,
+  `LoanID` int(11) auto_increment primary key,
   `AccountNo` int(11) NOT NULL,
   `LoanType` enum('Personal Loan','Business Loan') DEFAULT NULL,
   `LoanAmount` float(30,2) DEFAULT NULL,
@@ -522,16 +523,7 @@ CREATE TABLE `transactions` (
 
 
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `account_balance`  AS  select `customer_account`.`AccountNo` AS `AccountNo`,`customer`.`CustomerName` AS `CustomerName`,`customer`.`NIC` AS `NIC`,`account`.`Balance` AS `Balance` from ((`customer` join `customer_account` on((`customer`.`CustomerID` = `customer_account`.`CustomerID`))) join `account` on((`customer_account`.`AccountNo` = `account`.`AccountNo`))) ;
 
--- --------------------------------------------------------
-
---
--- Structure for view `lateloanreport`
---
-DROP TABLE IF EXISTS `lateloanreport`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `lateloanreport`  AS  select `loan`.`AccountNo` AS `AccountNo`,`loansettlement`.`DateTime` AS `DateTime`,`loansettlement`.`DueDate` AS `DueDate`,`account`.`BranchID` AS `BranchID`,`loansettlement`.`PaidOnTime` AS `PaidOnTime` from ((`loansettlement` left join `loan` on((`loansettlement`.`LoanID` = `loan`.`LoanID`))) left join `account` on((`loan`.`AccountNo` = `account`.`AccountNo`))) ;
 
 --
 -- Indexes for dumped tables
@@ -669,8 +661,7 @@ ALTER TABLE `customer`
 --
 -- AUTO_INCREMENT for table `loan`
 --
-ALTER TABLE `loan`
-  MODIFY `LoanID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
 
 --
 -- AUTO_INCREMENT for table `loanapplications`
@@ -774,3 +765,7 @@ from customer join customer_account using(CustomerID) join account using (Accoun
 create view lateloanReport as
 SELECT AccountNo,DateTime,DueDate from  loansettlement left join loan using(LoanID)
 left join account using(AccountNo);
+
+
+create index fdplanPeriod_index on fdplan(period);
+create index branch_name_index on branch(branchName);
