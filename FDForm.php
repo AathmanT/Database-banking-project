@@ -77,7 +77,7 @@
 
 <?php
 
-$db=new mysqli('localhost','root','','bank3');
+$db=new mysqli('localhost','root','','banking');
 
 if(!empty($_POST)) {
 

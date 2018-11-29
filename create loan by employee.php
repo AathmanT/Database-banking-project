@@ -3,14 +3,20 @@
 $db=new mysqli('localhost','root','','banking');
 
 if(!empty($_POST)) {
-
+    $employeeid=$_POST['EmployeeID'];
     $sender = $_POST['AccountNo'];
     $reciever = $_POST['LoanType'];
     $amount = $_POST['RepayYears'];
     $TransactionID = $_POST['Amount'];
 
-    $db->query("insert into loanapplications (LoanType,AccountNo,EmployeeID,RepayYears,Amount) values
- ('{$_POST['LoanType']}','{$_POST['AccountNo']}','160001','{$_POST['RepayYears']}','{$_POST['Amount']}')");
+    //$db->query("insert into loanapplications (LoanType,AccountNo,EmployeeID,RepayYears,Amount) values
+ //('{$_POST['LoanType']}','{$_POST['AccountNo']}','160001','{$_POST['RepayYears']}','{$_POST['Amount']}')");
+
+    $stmt = $db->prepare("insert into loanapplications (LoanType,AccountNo,EmployeeID,RepayYears,Amount) values
+ (?,?,?,?,?)");
+    $stmt->bind_param('sisid',$_POST['LoanType'], $_POST['AccountNo'],$_POST['EmployeeID'],$_POST['RepayYears'],$_POST['Amount']);
+    $stmt->execute();
+
 }
 
 ?>
@@ -79,15 +85,17 @@ if(!empty($_POST)) {
 
 <div>
     <form action="" method="post">
+        <label for="EmployeeID">EmployeeID</label>
+        <input type="text" id="EmployeeID" name="EmployeeID" placeholder="EmployeeID..">
+
         <label for="AccountNo">Account no</label>
         <input type="text" id="AccountNo" name="AccountNo" placeholder="Account no..">
 
         <label for="LoanType">Loan type</label>
         <select id="LoanType" name="LoanType">
-            <option value="Business">Business</option>
-            <option value="Personal">Personal</option>
+            <option value="BusinessLoan">BusinessLoan</option>
+            <option value="PersonalLoan">PersonalLoan</option>
         </select>
-
 
         <label for="RepayYears">RepayYears</label>
         <input type="number"  id="RepayYears" name="RepayYears" required placeholder="RepayYears.." min="0">
