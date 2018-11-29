@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 29, 2018 at 12:49 AM
+-- Generation Time: Nov 29, 2018 at 02:30 AM
 -- Server version: 10.1.29-MariaDB
 -- PHP Version: 7.2.0
 
@@ -295,6 +295,20 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
+-- Stand-in structure for view `lateloanreport`
+-- (See below for the actual view)
+--
+CREATE TABLE `lateloanreport` (
+`AccountNo` int(11)
+,`DateTime` date
+,`DueDate` date
+,`BranchID` int(11)
+,`PaidOnTime` tinyint(1)
+);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `loan`
 --
 
@@ -547,6 +561,15 @@ DROP TABLE IF EXISTS `account_balance`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `account_balance`  AS  select `customer_account`.`AccountNo` AS `AccountNo`,`customer`.`CustomerName` AS `CustomerName`,`customer`.`NIC` AS `NIC`,`account`.`Balance` AS `Balance` from ((`customer` join `customer_account` on((`customer`.`CustomerID` = `customer_account`.`CustomerID`))) join `account` on((`customer_account`.`AccountNo` = `account`.`AccountNo`))) ;
 
+-- --------------------------------------------------------
+
+--
+-- Structure for view `lateloanreport`
+--
+DROP TABLE IF EXISTS `lateloanreport`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `lateloanreport`  AS  select `loan`.`AccountNo` AS `AccountNo`,`loansettlement`.`DateTime` AS `DateTime`,`loansettlement`.`DueDate` AS `DueDate`,`account`.`BranchID` AS `BranchID`,`loansettlement`.`PaidOnTime` AS `PaidOnTime` from ((`loansettlement` left join `loan` on((`loansettlement`.`LoanID` = `loan`.`LoanID`))) left join `account` on((`loan`.`AccountNo` = `account`.`AccountNo`))) ;
+
 --
 -- Indexes for dumped tables
 --
@@ -726,7 +749,7 @@ ALTER TABLE `loan`
 -- AUTO_INCREMENT for table `loanapplications`
 --
 ALTER TABLE `loanapplications`
-  MODIFY `ApplicationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `ApplicationID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `loansettlement`
